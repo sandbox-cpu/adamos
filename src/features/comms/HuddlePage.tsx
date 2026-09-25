@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import { ArrowLeft, Check, ListChecks, MessagesSquare, MoreHorizontal, Pencil, Play, Plus, Trash2, UsersRound, Wand2 } from 'lucide-react'
 import { db } from '../../lib/db'
@@ -74,7 +74,8 @@ function NewHuddle({ onBack }: { onBack?: () => void }) {
   const projects = useProjects()
   const [topic, setTopic] = useState('')
   const [selected, setSelected] = useState<string[]>([])
-  const [projectId, setProjectId] = useState('')
+  const [params] = useSearchParams()
+  const [projectId, setProjectId] = useState(params.get('project') ?? '')
   const [starting, setStarting] = useState(false)
 
   const ideas = useMemo(() => {

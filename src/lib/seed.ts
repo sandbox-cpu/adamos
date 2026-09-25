@@ -442,7 +442,16 @@ export async function refreshDemoEvents(force = false): Promise<void> {
       .filter((e) => !!e.demo)
       .delete()
     const today = new Date()
-    const at = (dayOffset: number, h: number, m: number) => set(addDays(today, dayOffset), { hours: h, minutes: m, seconds: 0, milliseconds: 0 })
+    // Offsets count working days, so sample meetings never land on a weekend (today always has some).
+    const workday = (offset: number) => {
+      let d = today
+      for (let left = Math.abs(offset); left > 0;) {
+        d = addDays(d, Math.sign(offset))
+        if (d.getDay() !== 0 && d.getDay() !== 6) left--
+      }
+      return d
+    }
+    const at = (dayOffset: number, h: number, m: number) => set(workday(dayOffset), { hours: h, minutes: m, seconds: 0, milliseconds: 0 })
     const ev = (dayOffset: number, h: number, m: number, mins: number, title: string, extra: Partial<CalEvent> = {}): CalEvent => {
       const start = at(dayOffset, h, m)
       return {

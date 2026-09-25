@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useDraftField } from '../../hooks/useDraftField'
 import { useNavigate } from 'react-router-dom'
 import { Brain, Check, Copy, Crown, MessageSquare, Plus, Repeat2, Sparkles, Trash2, X } from 'lucide-react'
 import { AGENT_COLORS } from '../../lib/agents/defaults'
@@ -39,40 +40,6 @@ const PERSONALITY: { key: keyof Personality; label: string; left: string; right:
   { key: 'detail', label: 'Detail', left: 'Brief', right: 'Thorough' },
   { key: 'boldness', label: 'Ideas', left: 'Cautious', right: 'Bold' },
 ]
-
-/** Keeps a text field responsive while saving it quietly in the background. */
-function useDraftField(value: string, save: (v: string) => void, delay = 450) {
-  const [draft, setDraft] = useState(value)
-  const saveRef = useRef(save)
-  const pending = useRef<string | null>(null)
-  useEffect(() => {
-    saveRef.current = save
-  })
-  useEffect(() => {
-    if (pending.current === null) setDraft(value)
-  }, [value])
-  useEffect(() => {
-    if (pending.current === null) return
-    const t = setTimeout(() => {
-      if (pending.current !== null) saveRef.current(pending.current)
-      pending.current = null
-    }, delay)
-    return () => clearTimeout(t)
-  }, [draft, delay])
-  useEffect(
-    () => () => {
-      if (pending.current !== null) saveRef.current(pending.current)
-    },
-    [],
-  )
-  return [
-    draft,
-    (v: string) => {
-      pending.current = v
-      setDraft(v)
-    },
-  ] as const
-}
 
 function Section({ title, hint, children, action }: { title: string; hint?: string; children: React.ReactNode; action?: React.ReactNode }) {
   return (

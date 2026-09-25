@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ArrowLeft, BrainCircuit, Check, ChevronDown, CircleStop, Lightbulb, RotateCcw, Sparkles, Swords, Trash2, TriangleAlert, Wand2 } from 'lucide-react'
 import { createMastermind, deleteMastermind, liveKey, restartMastermind, runMastermind, stopMastermind } from '../../lib/agents/mastermind'
 import { suggestParticipants } from '../../lib/agents/chat'
@@ -38,7 +38,8 @@ function Setup() {
   const [objective, setObjective] = useState('')
   const [context, setContext] = useState('')
   const [showContext, setShowContext] = useState(false)
-  const [projectId, setProjectId] = useState('')
+  const [params] = useSearchParams()
+  const [projectId, setProjectId] = useState(params.get('project') ?? '')
   const [depth, setDepth] = useState<MastermindSession['depth']>('standard')
   const [seats, setSeats] = useState<string[]>([])
   const [starting, setStarting] = useState(false)
