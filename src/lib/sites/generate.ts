@@ -5,7 +5,7 @@ import type { Agent, Site, SiteBrief, SiteItem, SiteSection, SiteSectionType } f
 import { truncate, uid } from '../utils'
 import { trackJob } from '../../stores/jobs'
 import { runAgent } from '../agents/runtime'
-import { fullPrompt, pollinationsUrl } from '../media/generate'
+import { generateAndSaveImage } from '../media/generate'
 import { extractHtml } from './render'
 import { pageNameFrom } from './names'
 import { presetById, SITE_PRESETS } from './themes'
@@ -119,10 +119,40 @@ export function normaliseSection(raw: unknown, keep?: SiteSection): SiteSection 
     variant: keep?.variant,
   }
   const prompt = clean(r.imagePrompt, 500)
-  if (prompt && !section.image && (type === 'hero' || type === 'split')) {
-    section.image = pollinationsUrl(fullPrompt(prompt, 'editorial'), type === 'hero' ? 832 : 1024, type === 'hero' ? 1040 : 820, Math.floor(Math.random() * 1e6))
-  }
+  if (prompt && !section.image && (type === 'hero' || type === 'split')) section.imagePrompt = prompt
   return section
+}
+
+/** Makes the pictures a page asked for, one at a time, and drops each in when it's ready. */
+export async function illustrateSite(siteId: string, signal?: AbortSignal): Promise<void> {
+  const site = await db.sites.get(siteId)
+  if (!site) return
+  const targets = site.sections.filter((s) => s.imagePrompt && !s.image)
+  if (!targets.length) return
+  const patch = async (id: string, change: Partial<SiteSection>) => {
+    const latest = await db.sites.get(siteId)
+    if (latest) await db.sites.update(siteId, { sections: latest.sections.map((s) => (s.id === id ? { ...s, ...change } : s)) })
+  }
+  await trackJob({ id: `site-pictures:${siteId}`, kind: 'site', title: `Pictures for ${site.name}`, stage: 'Creating pictures', link: `/sites/${siteId}` }, async (setStage) => {
+    for (const [i, section] of targets.entries()) {
+      setStage(`Picture ${i + 1} of ${targets.length}`)
+      try {
+        const media = await generateAndSaveImage({
+          prompt: section.imagePrompt!,
+          styleId: 'editorial',
+          aspectId: section.type === 'hero' ? 'portrait' : 'landscape',
+          projectId: site.projectId,
+          signal,
+          log: false,
+        })
+        await patch(section.id, { image: `media:${media.id}`, imagePrompt: undefined })
+      } catch (err) {
+        // Pictures are a bonus: clear what's left so the page doesn't keep waiting, then report it.
+        for (const rest of targets.slice(i)) await patch(rest.id, { imagePrompt: undefined })
+        throw err
+      }
+    }
+  })
 }
 
 function lowerFirst(text: string): string {
@@ -277,6 +307,7 @@ export async function generateSite(siteId: string, signal?: AbortSignal): Promis
           await db.sites.update(siteId, { mode: 'sections' })
           const data = demoSite(site) as { sections: unknown[] }
           await db.sites.update(siteId, { sections: data.sections.map((s) => normaliseSection(s)), status: 'ready', stage: undefined, updatedAt: Date.now() })
+          void illustrateSite(siteId).catch(() => undefined)
           return
         }
         html = html.replace(/<script\b[^>]*\bsrc=[^>]*>\s*<\/script>/gi, '')
@@ -320,6 +351,7 @@ export async function generateSite(siteId: string, signal?: AbortSignal): Promis
           error: undefined,
           updatedAt: Date.now(),
         })
+        void illustrateSite(siteId).catch(() => undefined)
       }
       void logActivity('site', `${agent.name} created the landing page “${site.name}”`, { agentId: agent.id, minutesSaved: MINUTES_SAVED.site, link: `/sites/${siteId}` })
     } catch (err) {
@@ -410,6 +442,7 @@ export async function reviseSite(siteId: string, instruction: string, signal?: A
           if (sections.length) await db.sites.update(siteId, { sections })
         }
         await db.sites.update(siteId, { status: 'ready', stage: undefined, updatedAt: Date.now() })
+        void illustrateSite(siteId).catch(() => undefined)
       } catch (err) {
         await db.sites.update(siteId, { status: 'ready', stage: undefined })
         throw err

@@ -328,12 +328,13 @@ function ItemsEditor({ spec, items, onChange }: { spec: ItemSpec; items: SiteIte
 }
 
 function ImageField({ section, images, projectId, onChange }: { section: SiteSection; images: Record<string, string>; projectId?: string; onChange: (s: SiteSection) => void }) {
-  const [idea, setIdea] = useState('')
+  const [idea, setIdea] = useState(section.imagePrompt ?? '')
   const [busy, setBusy] = useState(false)
   const [picking, setPicking] = useState(false)
   const [failed, setFailed] = useState<string | null>(null)
   const src = section.image?.startsWith('media:') ? images[section.image.slice(6)] : section.image
   const hero = section.type === 'hero'
+  const coming = !!section.imagePrompt && !section.image
 
   const create = async () => {
     setBusy(true)
@@ -353,7 +354,13 @@ function ImageField({ section, images, projectId, onChange }: { section: SiteSec
     <div>
       <Label>Picture</Label>
       <div className="overflow-hidden rounded-xl border border-white/[0.07] bg-black/20">
-        {src && failed !== src ? (
+        {coming ? (
+          <div className={cn('grid place-items-center text-center text-[12px] text-soft', hero ? 'aspect-[4/3]' : 'aspect-[16/10]', 'animate-pulse bg-white/[0.03]')}>
+            <div>
+              <Sparkles className="mx-auto mb-1.5 size-5 text-[var(--accent)]" />A picture is being made for this section…
+            </div>
+          </div>
+        ) : src && failed !== src ? (
           <img src={src} alt="" onError={() => setFailed(src)} className={cn('w-full object-cover', hero ? 'aspect-[4/3]' : 'aspect-[16/10]')} />
         ) : (
           <div className={cn('grid place-items-center gap-1 text-center text-[12px] text-faint', hero ? 'aspect-[4/3]' : 'aspect-[16/10]')}>

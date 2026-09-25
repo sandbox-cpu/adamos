@@ -331,7 +331,7 @@ export async function illustrateDeck(deckId: string, max = 3): Promise<void> {
   const targets = deck.slides.filter((s) => s.imagePrompt && !s.image?.mediaId && !s.image?.url).slice(0, max)
   for (const slide of targets) {
     try {
-      const media = await generateAndSaveImage({ prompt: slide.imagePrompt!, styleId: 'editorial', aspectId: 'landscape', projectId: deck.projectId })
+      const media = await generateAndSaveImage({ prompt: slide.imagePrompt!, styleId: 'editorial', aspectId: 'landscape', projectId: deck.projectId, log: false })
       const latest = await db.decks.get(deckId)
       if (!latest) return
       await db.decks.update(deckId, {

@@ -2,7 +2,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useMemo } from 'react'
 import { db } from '../lib/db'
 import { ROLE_BANK } from '../lib/agents/roles'
-import type { Agent, CalEvent, ConversationKind, Role } from '../lib/types'
+import type { Agent, CalEvent, ConversationKind, MediaItem, Role } from '../lib/types'
 
 export function useAgents(): Agent[] {
   return useLiveQuery(() => db.agents.orderBy('order').toArray(), [], [] as Agent[])
@@ -129,8 +129,8 @@ export function useCoverage() {
   return useLiveQuery(() => db.coverage.orderBy('date').reverse().toArray(), [], [])
 }
 
-export function useMedia() {
-  return useLiveQuery(() => db.media.orderBy('createdAt').reverse().toArray(), [], [])
+export function useMedia(): MediaItem[] {
+  return useLiveQuery(() => db.media.orderBy('createdAt').reverse().toArray(), [], [] as MediaItem[])
 }
 
 export function useNoteCount(): number {

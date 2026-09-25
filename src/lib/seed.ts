@@ -5,6 +5,7 @@ import { demoNotes } from './brain/demo'
 import type { LogEntry, CalEvent, ContentPiece, CoverageItem, Deck, MediaContact, Project, ResearchReport, Site, Task } from './types'
 import { dateFromNow, uid } from './utils'
 import { SITE_PRESETS } from './sites/themes'
+import { seedDemoMedia } from './media/demo'
 
 const SEEDED_KEY = 'seeded.v1'
 const DEMO_WEEK_KEY = 'demo.eventsWeek'
@@ -23,7 +24,10 @@ export async function ensureSeeded(): Promise<boolean> {
       return true
     },
   )
-  if (seededNow) await refreshDemoEvents(true)
+  if (seededNow) {
+    await refreshDemoEvents(true)
+    void seedDemoMedia()
+  }
   return seededNow
 }
 
@@ -492,19 +496,24 @@ export async function refreshDemoEvents(force = false): Promise<void> {
 }
 
 export async function clearDemoData(): Promise<void> {
-  await db.transaction('rw', [db.projects, db.tasks, db.events, db.contacts, db.coverage, db.content, db.research, db.decks, db.sites, db.notes, db.log, db.kv], async () => {
-    await db.log.filter((x) => !!x.demo).delete()
-    await db.projects.filter((x) => !!x.demo).delete()
-    await db.tasks.filter((x) => !!x.demo).delete()
-    await db.events.filter((x) => !!x.demo).delete()
-    await db.contacts.filter((x) => !!x.demo).delete()
-    await db.coverage.filter((x) => !!x.demo).delete()
-    await db.content.filter((x) => !!x.demo).delete()
-    await db.research.filter((x) => !!x.demo).delete()
-    await db.decks.filter((x) => !!x.demo).delete()
-    await db.sites.filter((x) => !!x.demo).delete()
-    await db.notes.filter((x) => !!x.demo).delete()
-  })
+  await db.transaction(
+    'rw',
+    [db.projects, db.tasks, db.events, db.contacts, db.coverage, db.content, db.research, db.decks, db.sites, db.notes, db.media, db.log, db.kv],
+    async () => {
+      await db.log.filter((x) => !!x.demo).delete()
+      await db.projects.filter((x) => !!x.demo).delete()
+      await db.tasks.filter((x) => !!x.demo).delete()
+      await db.events.filter((x) => !!x.demo).delete()
+      await db.contacts.filter((x) => !!x.demo).delete()
+      await db.coverage.filter((x) => !!x.demo).delete()
+      await db.content.filter((x) => !!x.demo).delete()
+      await db.research.filter((x) => !!x.demo).delete()
+      await db.decks.filter((x) => !!x.demo).delete()
+      await db.sites.filter((x) => !!x.demo).delete()
+      await db.notes.filter((x) => !!x.demo).delete()
+      await db.media.filter((x) => !!x.demo).delete()
+    },
+  )
 }
 
 export async function resetEverything(): Promise<void> {

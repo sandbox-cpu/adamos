@@ -371,6 +371,8 @@ export interface SiteSection {
   cta?: { label: string; href: string }
   cta2?: { label: string; href: string }
   image?: string
+  /** A picture still to be made for this section. */
+  imagePrompt?: string
   variant?: string
 }
 

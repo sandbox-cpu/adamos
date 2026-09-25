@@ -3,7 +3,7 @@ import { FriendlyError, httpError, networkError } from '../llm/errors'
 import { geminiImage } from '../llm/gemini'
 import { getLeadAgent, logActivity, MINUTES_SAVED } from '../ops'
 import type { ImageProviderId, MediaItem } from '../types'
-import { truncate, uid } from '../utils'
+import { downloadBlob, safeFileName, sleep, truncate, uid } from '../utils'
 import { useSettings } from '../../stores/settings'
 import { useVault } from '../../stores/vault'
 import { runAgent } from '../agents/runtime'
@@ -70,6 +70,75 @@ export function pollinationsUrl(prompt: string, width: number, height: number, s
   return `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?${params.toString()}`
 }
 
+/* Without a key, Pollinations makes about one picture every 15 seconds per person, so requests take turns. */
+const POLLINATIONS_GAP_FREE = 15_500
+const POLLINATIONS_GAP_KEYED = 1_200
+let pollinationsNext = 0
+
+async function pollinationsTurn(gap: number, signal?: AbortSignal, onWait?: (ms: number) => void): Promise<void> {
+  const now = Date.now()
+  const start = Math.max(now, pollinationsNext)
+  pollinationsNext = start + gap
+  if (start > now) {
+    onWait?.(start - now)
+    await sleep(start - now, signal)
+  }
+}
+
+/**
+ * When it's busy, the free service can answer with a stand-in picture instead of an error.
+ * Real pictures come back at the requested shape and are far smaller than the stand-in.
+ */
+async function looksLikeStandIn(blob: Blob, width: number, height: number): Promise<boolean> {
+  if (blob.size > 1_150_000) return true
+  try {
+    const bmp = await createImageBitmap(blob)
+    const wanted = width / height
+    const got = bmp.width / bmp.height
+    bmp.close()
+    return Math.abs(got - wanted) / wanted > 0.06
+  } catch {
+    return false
+  }
+}
+
+async function pollinationsImage(opts: {
+  prompt: string
+  width: number
+  height: number
+  seed: number
+  signal?: AbortSignal
+  onWait?: (ms: number) => void
+}): Promise<GeneratedImage> {
+  const key = await keyFor('pollinations').catch(() => undefined)
+  // Newer Pollinations keys (sk_… or pk_…) use the current service; older tokens use the classic one.
+  const modern = !!key && /^(sk|pk)_/.test(key)
+  const url = modern
+    ? `https://gen.pollinations.ai/image/${encodeURIComponent(opts.prompt)}?${new URLSearchParams({ width: String(opts.width), height: String(opts.height), seed: String(opts.seed) })}`
+    : pollinationsUrl(opts.prompt, opts.width, opts.height, opts.seed, key)
+  for (let attempt = 0; attempt < 2; attempt++) {
+    await pollinationsTurn(key ? POLLINATIONS_GAP_KEYED : POLLINATIONS_GAP_FREE, opts.signal, opts.onWait)
+    let res: Response
+    try {
+      res = await fetch(url, { signal: opts.signal, headers: key ? { Authorization: `Bearer ${key}` } : undefined })
+    } catch {
+      if (opts.signal?.aborted) throw new DOMException('Aborted', 'AbortError')
+      if (modern) throw networkError('Pollinations')
+      // The browser may not be allowed to download the file; the address still works as a picture.
+      return { url, provider: 'pollinations' }
+    }
+    if (res.status === 429) continue
+    if (res.status === 401 || res.status === 403)
+      throw new FriendlyError('Pollinations didn’t accept your key.', 'Check the Pollinations key in the Vault, or remove it to use the free service.')
+    if (!res.ok) throw httpError('Pollinations', res.status, await res.text().catch(() => ''))
+    const blob = await res.blob()
+    if (!blob.type.startsWith('image/')) throw new FriendlyError('The free image service didn’t return a picture.', 'Try again in a moment.')
+    if (!key && (await looksLikeStandIn(blob, opts.width, opts.height))) continue
+    return { blob, provider: 'pollinations' }
+  }
+  throw new FriendlyError('The free image service is busy right now.', 'Try again in a minute. For faster pictures, add a free Pollinations or Hugging Face key in the Vault.')
+}
+
 async function keyFor(service: string): Promise<string | undefined> {
   const secret = (await db.secrets.where('service').equals(service).toArray())[0]
   if (!secret) return undefined
@@ -89,29 +158,14 @@ export async function generateImage(opts: {
   seed?: number
   provider?: ImageProviderId
   signal?: AbortSignal
+  /** Called when the picture has to wait its turn with the free service. */
+  onWait?: (ms: number) => void
 }): Promise<GeneratedImage> {
   const settings = useSettings.getState().settings
   const provider = opts.provider ?? settings.media.provider
   const seed = opts.seed ?? Math.floor(Math.random() * 1_000_000)
 
-  if (provider === 'pollinations') {
-    const token = await keyFor('pollinations').catch(() => undefined)
-    const url = pollinationsUrl(opts.prompt, opts.width, opts.height, seed, token)
-    try {
-      const res = await fetch(url, { signal: opts.signal })
-      if (res.status === 429)
-        throw new FriendlyError('The free image service is busy right now.', 'Wait a few seconds and try again, or add a free Hugging Face token in the Vault.')
-      if (!res.ok) throw httpError('Pollinations', res.status, await res.text().catch(() => ''))
-      const blob = await res.blob()
-      if (!blob.type.startsWith('image/')) throw new FriendlyError('The free image service didn’t return an image.', 'Try again in a moment.')
-      return { blob, provider }
-    } catch (err) {
-      if (opts.signal?.aborted) throw new DOMException('Aborted', 'AbortError')
-      if (err instanceof FriendlyError) throw err
-      // The browser may not be allowed to download the file; the address still works as an image.
-      return { url, provider }
-    }
-  }
+  if (provider === 'pollinations') return pollinationsImage({ prompt: opts.prompt, width: opts.width, height: opts.height, seed, signal: opts.signal, onWait: opts.onWait })
 
   if (provider === 'huggingface') {
     const key = await keyFor('huggingface')
@@ -186,6 +240,17 @@ export async function uploadImage(file: File, projectId?: string): Promise<Media
   return saveMedia({ kind: 'image', title: file.name.replace(/\.[^.]+$/, '') || 'Upload', blob: file, width, height, projectId })
 }
 
+/** A short name for a picture, from its description. */
+export function pictureTitle(prompt: string): string {
+  const first = prompt
+    .trim()
+    .split(/[.,;:\n]|\s[–-]\s/)[0]
+    .trim()
+  const cut = first.length > 60 ? first.slice(0, Math.max(first.lastIndexOf(' ', 56), 30)) : first
+  const title = cut || truncate(prompt.trim(), 50) || 'Picture'
+  return title[0].toUpperCase() + title.slice(1)
+}
+
 export async function generateAndSaveImage(opts: {
   prompt: string
   styleId: string
@@ -193,12 +258,22 @@ export async function generateAndSaveImage(opts: {
   provider?: ImageProviderId
   signal?: AbortSignal
   projectId?: string
+  onWait?: (ms: number) => void
+  /** Add an entry to the activity feed (on by default). */
+  log?: boolean
 }): Promise<MediaItem> {
   const aspect = aspectById(opts.aspectId)
-  const img = await generateImage({ prompt: fullPrompt(opts.prompt, opts.styleId), width: aspect.width, height: aspect.height, provider: opts.provider, signal: opts.signal })
+  const img = await generateImage({
+    prompt: fullPrompt(opts.prompt, opts.styleId),
+    width: aspect.width,
+    height: aspect.height,
+    provider: opts.provider,
+    signal: opts.signal,
+    onWait: opts.onWait,
+  })
   const media = await saveMedia({
     kind: 'image',
-    title: truncate(opts.prompt, 60),
+    title: pictureTitle(opts.prompt),
     prompt: opts.prompt,
     style: opts.styleId,
     provider: img.provider,
@@ -208,7 +283,7 @@ export async function generateAndSaveImage(opts: {
     height: aspect.height,
     projectId: opts.projectId,
   })
-  void logActivity('content', `New image: “${truncate(opts.prompt, 50)}”`, { minutesSaved: MINUTES_SAVED.content / 2, link: `/media?item=${media.id}` })
+  if (opts.log !== false) void logActivity('content', `New picture: “${truncate(opts.prompt, 50)}”`, { minutesSaved: MINUTES_SAVED.content / 2, link: `/media?item=${media.id}` })
   return media
 }
 
@@ -266,4 +341,24 @@ export async function mediaDataUrl(item: Pick<MediaItem, 'blob' | 'url'>): Promi
     reader.onerror = () => resolve(undefined)
     reader.readAsDataURL(blob!)
   })
+}
+
+/** Saves a picture from the library to the computer. */
+export async function downloadMedia(item: Pick<MediaItem, 'blob' | 'url' | 'title'>): Promise<void> {
+  let blob = item.blob
+  if (!blob && item.url) {
+    try {
+      const res = await fetch(item.url)
+      if (res.ok) blob = await res.blob()
+    } catch {
+      // Fall back to opening the picture so it can be saved from the browser.
+    }
+    if (!blob) {
+      window.open(item.url, '_blank', 'noopener')
+      return
+    }
+  }
+  if (!blob) return
+  const ext = blob.type.includes('png') ? 'png' : blob.type.includes('webp') ? 'webp' : 'jpg'
+  downloadBlob(blob, `${safeFileName(item.title || 'picture')}.${ext}`)
 }
