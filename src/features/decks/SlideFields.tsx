@@ -17,7 +17,7 @@ function ListEditor({ items, onChange, placeholder }: { items: string[]; onChang
     <div className="space-y-1.5">
       {items.map((b, i) => (
         <div key={i} className="group flex gap-1.5">
-          <Textarea rows={1} autoGrow value={b} onChange={(e) => onChange(items.map((x, j) => (j === i ? e.target.value : x)))} className="min-h-9 py-2 text-[13px]" />
+          <Textarea rows={1} autoGrow value={b} onChange={(e) => onChange(items.map((x, j) => (j === i ? e.target.value : x)))} className="py-2 text-[13px]" />
           <button
             onClick={() => onChange(items.filter((_, j) => j !== i))}
             className="grid size-9 shrink-0 place-items-center rounded-lg text-faint hover:bg-white/[0.06] hover:text-fg"

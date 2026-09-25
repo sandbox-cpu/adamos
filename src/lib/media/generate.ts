@@ -171,6 +171,21 @@ export async function saveMedia(item: Omit<MediaItem, 'id' | 'createdAt'>): Prom
   return media
 }
 
+/** Saves a picture from the computer into the media library. */
+export async function uploadImage(file: File, projectId?: string): Promise<MediaItem> {
+  let width = 1600
+  let height = 1000
+  try {
+    const bmp = await createImageBitmap(file)
+    width = bmp.width
+    height = bmp.height
+    bmp.close()
+  } catch {
+    // Keep the defaults if the browser can't read the size.
+  }
+  return saveMedia({ kind: 'image', title: file.name.replace(/\.[^.]+$/, '') || 'Upload', blob: file, width, height, projectId })
+}
+
 export async function generateAndSaveImage(opts: {
   prompt: string
   styleId: string

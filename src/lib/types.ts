@@ -395,6 +395,8 @@ export interface SiteBrief {
   ctaLink: string
   style: string
   useWeb: boolean
+  /** The name was made up from the purpose, so the finished page's own title can replace it. */
+  autoName?: boolean
 }
 
 export interface Site {

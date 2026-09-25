@@ -7,7 +7,10 @@ import { trackJob } from '../../stores/jobs'
 import { runAgent } from '../agents/runtime'
 import { fullPrompt, pollinationsUrl } from '../media/generate'
 import { extractHtml } from './render'
+import { pageNameFrom } from './names'
 import { presetById, SITE_PRESETS } from './themes'
+
+export { pageNameFrom }
 
 export const SECTION_TYPES: { id: SiteSectionType; name: string; hint: string; emoji: string }[] = [
   { id: 'hero', name: 'Hero', hint: 'Big headline and buttons', emoji: '🚀' },
@@ -122,6 +125,10 @@ export function normaliseSection(raw: unknown, keep?: SiteSection): SiteSection 
   return section
 }
 
+function lowerFirst(text: string): string {
+  return /^[A-Z][a-z]/.test(text) ? text[0].toLowerCase() + text.slice(1) : text
+}
+
 function demoSite(site: Site): unknown {
   const b = site.brief
   const cta = b.cta || 'Get started'
@@ -137,8 +144,8 @@ function demoSite(site: Site): unknown {
       {
         type: 'hero',
         eyebrow: 'Introducing',
-        heading: truncate(b.purpose || site.name, 70),
-        subheading: `Made for ${b.audience || 'people who want more'}.`,
+        heading: truncate(site.name, 70),
+        subheading: b.audience ? `Made for ${lowerFirst(b.audience).replace(/[.\s]+$/, '')}.` : 'Everything you need to know, in one place.',
         ctaLabel: cta,
         ctaHref: link,
         cta2Label: 'Learn more',
@@ -273,7 +280,15 @@ export async function generateSite(siteId: string, signal?: AbortSignal): Promis
           return
         }
         html = html.replace(/<script\b[^>]*\bsrc=[^>]*>\s*<\/script>/gi, '')
-        await db.sites.update(siteId, { html, status: 'ready', stage: undefined, error: undefined, updatedAt: Date.now() })
+        const title = site.brief.autoName ? clean(html.match(/<title>([^<]{3,120})<\/title>/i)?.[1]?.split(/\s[|·–-]\s/)[0], 60) : ''
+        await db.sites.update(siteId, {
+          html,
+          ...(title ? { name: title, brief: { ...site.brief, autoName: false } } : {}),
+          status: 'ready',
+          stage: undefined,
+          error: undefined,
+          updatedAt: Date.now(),
+        })
       } else {
         await stage(`${agent.name} is writing the page`)
         const res = await runAgent({
@@ -295,7 +310,16 @@ export async function generateSite(siteId: string, signal?: AbortSignal): Promis
         const theme = keepTheme ? site.theme : { ...presetById(data.suggestedTheme!).theme }
         if (!keepTheme && data.primaryColor && HEX.test(data.primaryColor)) theme.primary = data.primaryColor
         if (!keepTheme && data.secondaryColor && HEX.test(data.secondaryColor)) theme.secondary = data.secondaryColor
-        await db.sites.update(siteId, { sections, theme, status: 'ready', stage: undefined, error: undefined, updatedAt: Date.now() })
+        const title = site.brief.autoName && !res.demo ? clean(data.pageTitle, 60) : ''
+        await db.sites.update(siteId, {
+          sections,
+          theme,
+          ...(title ? { name: title, brief: { ...site.brief, autoName: false } } : {}),
+          status: 'ready',
+          stage: undefined,
+          error: undefined,
+          updatedAt: Date.now(),
+        })
       }
       void logActivity('site', `${agent.name} created the landing page “${site.name}”`, { agentId: agent.id, minutesSaved: MINUTES_SAVED.site, link: `/sites/${siteId}` })
     } catch (err) {
@@ -307,11 +331,20 @@ export async function generateSite(siteId: string, signal?: AbortSignal): Promis
 
 export async function startSiteFromBrief(input: { name: string; purpose: string; audience?: string; cta?: string; agentId?: string; projectId?: string }): Promise<Site> {
   const site = await createSite({
-    name: input.name,
+    name: input.name.trim() || pageNameFrom(input.purpose),
     agentId: input.agentId,
     projectId: input.projectId,
     mode: 'sections',
-    brief: { purpose: input.purpose, audience: input.audience ?? '', keyMessages: '', cta: input.cta ?? '', ctaLink: '', style: 'Modern and premium', useWeb: false },
+    brief: {
+      purpose: input.purpose,
+      audience: input.audience ?? '',
+      keyMessages: '',
+      cta: input.cta ?? '',
+      ctaLink: '',
+      style: 'Modern and premium',
+      useWeb: false,
+      autoName: !input.name.trim(),
+    },
   })
   void generateSite(site.id).catch(() => undefined)
   return site

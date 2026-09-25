@@ -40,7 +40,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<H
         resize()
         onInput?.(e)
       }}
-      className={cn(control, 'min-h-[88px] resize-none py-2.5 leading-relaxed', className)}
+      className={cn(control, !autoGrow && 'min-h-[88px]', 'resize-none py-2.5 leading-relaxed', className)}
       {...rest}
     />
   )
