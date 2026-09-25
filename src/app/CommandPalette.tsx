@@ -26,6 +26,7 @@ import { startConversation } from '../lib/agents/chat'
 import { AgentAvatar } from '../components/agents/AgentAvatar'
 import { Kbd } from '../components/ui/bits'
 import { cn } from '../lib/utils'
+import { matchesShortcut, shortcutModifier } from '../lib/shortcuts'
 
 interface Item {
   id: string
@@ -53,7 +54,7 @@ export function CommandPalette() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+      if (matchesShortcut(e, 'k')) {
         e.preventDefault()
         setOpen(!useUI.getState().palette)
       }
@@ -249,7 +250,7 @@ export function CommandPalette() {
                 <Kbd>↵</Kbd> to choose
               </span>
               <span className="ml-auto flex items-center gap-1.5">
-                <MessageSquare className="size-3.5" /> <Kbd>⌘</Kbd>
+                <MessageSquare className="size-3.5" /> <Kbd>{shortcutModifier}</Kbd>
                 <Kbd>J</Kbd> opens {lead?.name ?? 'your lead'}
               </span>
             </div>

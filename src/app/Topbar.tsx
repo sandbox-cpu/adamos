@@ -12,6 +12,7 @@ import { Kbd } from '../components/ui/bits'
 import { cn, timeAgo } from '../lib/utils'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '../lib/db'
+import { shortcutModifier } from '../lib/shortcuts'
 
 function Clock() {
   const [now, setNow] = useState(new Date())
@@ -137,7 +138,7 @@ export function Topbar() {
         <Search className="size-4 shrink-0" />
         <span className="hidden flex-1 truncate text-left sm:block">Ask your team or search…</span>
         <span className="hidden items-center gap-1 sm:flex">
-          <Kbd>⌘</Kbd>
+          <Kbd>{shortcutModifier}</Kbd>
           <Kbd>K</Kbd>
         </span>
       </button>

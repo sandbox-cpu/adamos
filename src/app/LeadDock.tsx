@@ -10,6 +10,7 @@ import type { Conversation } from '../lib/types'
 import { AgentAvatar } from '../components/agents/AgentAvatar'
 import { ChatView } from '../components/chat/ChatView'
 import { useSettings } from '../stores/settings'
+import { matchesShortcut, shortcutModifier } from '../lib/shortcuts'
 
 function Starters({ onPick, starters }: { onPick: (s: string) => void; starters: string[] }) {
   return (
@@ -53,7 +54,7 @@ export function LeadDock() {
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'j') {
+      if (matchesShortcut(e, 'j')) {
         e.preventDefault()
         setDock(!useUI.getState().dock)
       }
@@ -92,7 +93,7 @@ export function LeadDock() {
             </span>
             <span className="hidden text-left sm:block">
               <span className="block text-[13px] font-semibold text-fg">Ask {lead.name}</span>
-              <span className="block text-[11px] text-muted">{running ? 'Working on it…' : '⌘J · your chief of staff'}</span>
+              <span className="block text-[11px] text-muted">{running ? 'Working on it…' : `${shortcutModifier}+J · your chief of staff`}</span>
             </span>
           </motion.button>
         )}

@@ -29,6 +29,7 @@ import { clearDemoData, resetEverything } from '../../lib/seed'
 import { IMAGE_PROVIDERS } from '../../lib/media/generate'
 import type { AIProfile, Settings } from '../../lib/types'
 import { cn, downloadText, isoDate } from '../../lib/utils'
+import { shortcutModifier } from '../../lib/shortcuts'
 import { ACCENTS, osNameOf, useSettings } from '../../stores/settings'
 import { useUI } from '../../stores/ui'
 import { useAgents, useProfiles, useRoles, useSecrets } from '../../hooks/data'
@@ -470,8 +471,8 @@ function DataSettings() {
 function AboutSettings() {
   const settings = useSettings((s) => s.settings)
   const shortcuts: [string[], string][] = [
-    [['⌘', 'K'], 'Search, jump anywhere or ask your lead'],
-    [['⌘', 'J'], 'Open your lead agent'],
+    [[shortcutModifier, 'K'], 'Search, jump anywhere or ask your lead'],
+    [[shortcutModifier, 'J'], 'Open your lead agent'],
     [['Enter'], 'Send a message'],
     [['Shift', 'Enter'], 'New line in a message'],
     [['@'], 'Mention an agent in a huddle'],

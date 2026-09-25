@@ -6,6 +6,7 @@ import { getProvider, modelLabel } from '../../lib/llm/providers'
 import { clearDemoData } from '../../lib/seed'
 import type { Settings } from '../../lib/types'
 import { cn } from '../../lib/utils'
+import { shortcutModifier } from '../../lib/shortcuts'
 import { ACCENTS, osNameOf, useSettings } from '../../stores/settings'
 import { useActiveAgents, useLead, useProfiles, useRoles } from '../../hooks/data'
 import { AgentAvatar } from '../../components/agents/AgentAvatar'
@@ -343,7 +344,7 @@ export default function Onboarding() {
       if (!settings.userName.trim()) await updateSettings({ userName: 'there' })
       await updateSettings({ onboarded: true })
       navigate('/')
-      toast.success(`Welcome to ${osName}`, 'Press ⌘K any time to search or ask your team.')
+      toast.success(`Welcome to ${osName}`, `Press ${shortcutModifier}+K any time to search or ask your team.`)
     } finally {
       setFinishing(false)
     }
