@@ -15,7 +15,12 @@ export function BrandMark({ size = 34 }: { size?: number }) {
       <div className="absolute inset-0 grid place-items-center rounded-[30%] border border-white/15 bg-ink-900">
         <div
           className="rounded-full"
-          style={{ width: size * 0.5, height: size * 0.5, background: 'radial-gradient(circle at 32% 28%, #fff, var(--accent) 45%, color-mix(in oklab, var(--accent) 40%, #05060a) 100%)', boxShadow: '0 0 14px var(--accent)' }}
+          style={{
+            width: size * 0.5,
+            height: size * 0.5,
+            background: 'radial-gradient(circle at 32% 28%, #fff, var(--accent) 45%, color-mix(in oklab, var(--accent) 40%, #05060a) 100%)',
+            boxShadow: '0 0 14px var(--accent)',
+          }}
         />
         <div className="absolute rounded-full border border-white/40" style={{ width: size * 0.8, height: size * 0.3, transform: 'rotate(-24deg)' }} />
       </div>
@@ -104,12 +109,19 @@ function SidebarBody({ collapsed, onNavigate }: { collapsed: boolean; onNavigate
               <LockOpen className="size-4" />
             </button>
           ) : (
-            <NavLink to="/vault" title={vaultStatus === 'locked' ? 'Vault locked' : 'Set up your vault'} className="grid size-8 place-items-center rounded-lg text-muted hover:bg-white/[0.06] hover:text-fg">
+            <NavLink
+              to="/vault"
+              title={vaultStatus === 'locked' ? 'Vault locked' : 'Set up your vault'}
+              className="grid size-8 place-items-center rounded-lg text-muted hover:bg-white/[0.06] hover:text-fg"
+            >
               {vaultStatus === 'uninitialized' ? <Sparkles className="size-4" /> : <Lock className="size-4" />}
             </NavLink>
           )}
         </div>
-        <button onClick={toggle} className="mt-2 hidden h-8 w-full items-center justify-center gap-2 rounded-lg text-xs text-faint transition hover:bg-white/[0.04] hover:text-soft lg:flex">
+        <button
+          onClick={toggle}
+          className="mt-2 hidden h-8 w-full items-center justify-center gap-2 rounded-lg text-xs text-faint transition hover:bg-white/[0.04] hover:text-soft lg:flex"
+        >
           {collapsed ? <ChevronsRight className="size-4" /> : <ChevronsLeft className="size-4" />}
           {!collapsed && 'Collapse'}
         </button>
@@ -124,7 +136,12 @@ export function Sidebar() {
   const setMobileNav = useUI((s) => s.setMobileNav)
   return (
     <>
-      <aside className={cn('relative z-30 hidden shrink-0 border-r border-white/[0.06] bg-ink-900/60 backdrop-blur-xl transition-[width] duration-300 lg:block', collapsed ? 'w-[76px]' : 'w-[248px]')}>
+      <aside
+        className={cn(
+          'relative z-30 hidden shrink-0 border-r border-white/[0.06] bg-ink-900/60 backdrop-blur-xl transition-[width] duration-300 lg:block',
+          collapsed ? 'w-[76px]' : 'w-[248px]',
+        )}
+      >
         <SidebarBody collapsed={collapsed} />
       </aside>
       <AnimatePresence>

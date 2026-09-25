@@ -80,21 +80,4 @@ export const AGENT_COLORS = [
   '#e5e7eb',
 ]
 
-export const AGENT_NAME_IDEAS = [
-  'Orion',
-  'Juno',
-  'Vega',
-  'Kai',
-  'Mira',
-  'Onyx',
-  'Sol',
-  'Wren',
-  'Finch',
-  'Rhea',
-  'Pax',
-  'Ember',
-  'Nyx',
-  'Arlo',
-  'Cleo',
-  'Zed',
-]
+export const AGENT_NAME_IDEAS = ['Orion', 'Juno', 'Vega', 'Kai', 'Mira', 'Onyx', 'Sol', 'Wren', 'Finch', 'Rhea', 'Pax', 'Ember', 'Nyx', 'Arlo', 'Cleo', 'Zed']

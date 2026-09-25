@@ -99,7 +99,15 @@ function Greeting() {
 }
 
 function Reclaimed() {
-  const logs = useLiveQuery(() => db.log.where('at').above(Date.now() - 14 * 86_400_000).toArray(), [], [])
+  const logs = useLiveQuery(
+    () =>
+      db.log
+        .where('at')
+        .above(Date.now() - 14 * 86_400_000)
+        .toArray(),
+    [],
+    [],
+  )
   const days = useMemo(() => {
     const out: { label: string; minutes: number }[] = []
     for (let i = 13; i >= 0; i--) {
@@ -300,7 +308,9 @@ function FocusTasks() {
                 )}
               </button>
               {t.priority === 'high' && <span className="size-1.5 shrink-0 rounded-full bg-bad" title="High priority" />}
-              {due && <span className={cn('shrink-0 text-[11px] font-medium', due.tone === 'bad' ? 'text-bad' : due.tone === 'warn' ? 'text-warn' : 'text-muted')}>{due.text}</span>}
+              {due && (
+                <span className={cn('shrink-0 text-[11px] font-medium', due.tone === 'bad' ? 'text-bad' : due.tone === 'warn' ? 'text-warn' : 'text-muted')}>{due.text}</span>
+              )}
             </div>
           )
         })}
@@ -331,7 +341,12 @@ function Team() {
         {agents.map((a) => {
           const working = busy.has(a.id)
           return (
-            <button key={a.id} onClick={() => navigate(`/agents/${a.id}`)} className="group flex flex-col items-center gap-1.5 rounded-2xl py-1 transition hover:bg-white/[0.03]" title={roles.find((r) => r.id === a.roleId)?.name}>
+            <button
+              key={a.id}
+              onClick={() => navigate(`/agents/${a.id}`)}
+              className="group flex flex-col items-center gap-1.5 rounded-2xl py-1 transition hover:bg-white/[0.03]"
+              title={roles.find((r) => r.id === a.roleId)?.name}
+            >
               <AgentAvatar agent={a} size="md" active={working} status={working ? 'working' : 'online'} />
               <span className="text-[12px] font-medium text-soft group-hover:text-fg">{a.name}</span>
             </button>
@@ -354,7 +369,11 @@ function Activity() {
         {log.map((l) => {
           const agent = agents.find((a) => a.id === l.agentId)
           return (
-            <button key={l.id} onClick={() => l.link && navigate(l.link)} className="flex w-full items-start gap-3 rounded-2xl px-2 py-2 text-left transition hover:bg-white/[0.03]">
+            <button
+              key={l.id}
+              onClick={() => l.link && navigate(l.link)}
+              className="flex w-full items-start gap-3 rounded-2xl px-2 py-2 text-left transition hover:bg-white/[0.03]"
+            >
               {agent ? <AgentAvatar agent={agent} size="xs" className="mt-0.5" /> : <span className="mt-1.5 size-2 rounded-full bg-[var(--accent)]" />}
               <div className="min-w-0 flex-1">
                 <div className="text-[13px] leading-snug text-soft">{l.text}</div>
@@ -478,9 +497,14 @@ function SetupChecklist() {
             key={s.label}
             disabled={s.done}
             onClick={() => navigate(s.to)}
-            className={cn('flex items-center gap-3 rounded-2xl border px-3.5 py-3 text-left transition', s.done ? 'border-good/20 bg-good/[0.05]' : 'border-white/[0.08] bg-white/[0.03] hover:border-white/20')}
+            className={cn(
+              'flex items-center gap-3 rounded-2xl border px-3.5 py-3 text-left transition',
+              s.done ? 'border-good/20 bg-good/[0.05]' : 'border-white/[0.08] bg-white/[0.03] hover:border-white/20',
+            )}
           >
-            <span className={cn('grid size-8 shrink-0 place-items-center rounded-xl', s.done ? 'bg-good/15 text-good' : 'bg-white/[0.06] text-soft')}>{s.done ? <Check className="size-4" /> : <s.icon className="size-4" />}</span>
+            <span className={cn('grid size-8 shrink-0 place-items-center rounded-xl', s.done ? 'bg-good/15 text-good' : 'bg-white/[0.06] text-soft')}>
+              {s.done ? <Check className="size-4" /> : <s.icon className="size-4" />}
+            </span>
             <span className="min-w-0">
               <span className={cn('block text-[13px] font-medium', s.done ? 'text-muted line-through' : 'text-fg')}>{s.label}</span>
               <span className="block truncate text-[11px] text-faint">{s.hint}</span>

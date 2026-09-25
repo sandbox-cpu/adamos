@@ -26,7 +26,12 @@ function Typing() {
   return (
     <div className="flex items-center gap-1 py-2">
       {[0, 1, 2].map((i) => (
-        <motion.span key={i} className="size-1.5 rounded-full bg-soft" animate={{ opacity: [0.25, 1, 0.25], y: [0, -3, 0] }} transition={{ duration: 1, repeat: Infinity, delay: i * 0.15 }} />
+        <motion.span
+          key={i}
+          className="size-1.5 rounded-full bg-soft"
+          animate={{ opacity: [0.25, 1, 0.25], y: [0, -3, 0] }}
+          transition={{ duration: 1, repeat: Infinity, delay: i * 0.15 }}
+        />
       ))}
     </div>
   )
@@ -34,7 +39,12 @@ function Typing() {
 
 function ActionButton({ label, icon, onClick }: { label: string; icon: React.ReactNode; onClick: () => void }) {
   return (
-    <button onClick={onClick} title={label} aria-label={label} className="grid size-7 place-items-center rounded-lg text-faint transition hover:bg-white/[0.07] hover:text-fg [&_svg]:size-3.5">
+    <button
+      onClick={onClick}
+      title={label}
+      aria-label={label}
+      className="grid size-7 place-items-center rounded-lg text-faint transition hover:bg-white/[0.07] hover:text-fg [&_svg]:size-3.5"
+    >
       {icon}
     </button>
   )
@@ -77,13 +87,27 @@ export const MessageView = memo(function MessageView({ message, agent, role, age
   const notices = (streaming ? live?.notices : message.notices) ?? []
 
   const saveToBrain = async () => {
-    const title = `${agent?.name ?? 'Agent'} – ${truncate(content.split('\n').find((l) => l.trim())?.replace(/^#+\s*/, '') ?? 'Note', 60)}`
-    const res = await saveNewNote(`${settings.brain.writeFolder}/Chats`, title, `${content}\n\n---\n_From ${agent?.name ?? 'an agent'} on ${format(message.createdAt, 'd MMM yyyy HH:mm')}_`)
+    const title = `${agent?.name ?? 'Agent'} – ${truncate(
+      content
+        .split('\n')
+        .find((l) => l.trim())
+        ?.replace(/^#+\s*/, '') ?? 'Note',
+      60,
+    )}`
+    const res = await saveNewNote(
+      `${settings.brain.writeFolder}/Chats`,
+      title,
+      `${content}\n\n---\n_From ${agent?.name ?? 'an agent'} on ${format(message.createdAt, 'd MMM yyyy HH:mm')}_`,
+    )
     toast.success('Saved to your brain', res.path, { label: 'Open', onClick: () => navigate(`/brain?note=${encodeURIComponent(res.path)}`) })
   }
 
   const makeTask = async () => {
-    const first = content.replace(/[#*_>`]/g, '').split(/\n|(?<=\.)\s/).find((l) => l.trim().length > 3) ?? 'Follow up'
+    const first =
+      content
+        .replace(/[#*_>`]/g, '')
+        .split(/\n|(?<=\.)\s/)
+        .find((l) => l.trim().length > 3) ?? 'Follow up'
     const task = await createTask({ title: truncate(first.trim(), 80), description: content, projectId, source: agent?.name })
     toast.success('Task added', task.title, { label: 'View board', onClick: () => navigate(projectId ? `/projects/${projectId}` : '/projects') })
   }
@@ -123,7 +147,9 @@ export const MessageView = memo(function MessageView({ message, agent, role, age
             <AnimatePresence>
               {showThinking && (
                 <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-                  <div className="mt-2 max-h-64 overflow-y-auto rounded-2xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-[12.5px] leading-relaxed whitespace-pre-wrap text-muted">{thinking}</div>
+                  <div className="mt-2 max-h-64 overflow-y-auto rounded-2xl border border-white/[0.06] bg-white/[0.02] px-4 py-3 text-[12.5px] leading-relaxed whitespace-pre-wrap text-muted">
+                    {thinking}
+                  </div>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -137,11 +163,7 @@ export const MessageView = memo(function MessageView({ message, agent, role, age
           </div>
         ))}
 
-        {content ? (
-          <Markdown className={cn(streaming && 'caret-live')}>{content}</Markdown>
-        ) : streaming ? (
-          <Typing />
-        ) : null}
+        {content ? <Markdown className={cn(streaming && 'caret-live')}>{content}</Markdown> : streaming ? <Typing /> : null}
 
         {message.status === 'error' && (
           <div className="mt-2 rounded-2xl border border-bad/25 bg-bad/[0.06] px-4 py-3">
@@ -156,7 +178,10 @@ export const MessageView = memo(function MessageView({ message, agent, role, age
                       <RefreshCw className="size-3.5" /> Try again
                     </button>
                   )}
-                  <button onClick={() => navigate('/settings?tab=ai')} className="flex items-center gap-1.5 rounded-lg bg-white/[0.07] px-2.5 py-1 text-xs text-fg hover:bg-white/[0.12]">
+                  <button
+                    onClick={() => navigate('/settings?tab=ai')}
+                    className="flex items-center gap-1.5 rounded-lg bg-white/[0.07] px-2.5 py-1 text-xs text-fg hover:bg-white/[0.12]"
+                  >
                     Check AI settings
                   </button>
                 </div>

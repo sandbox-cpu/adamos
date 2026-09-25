@@ -60,6 +60,11 @@ export function applyAccent(accent: AccentId) {
   document.documentElement.dataset.accent = accent
 }
 
+function applyMotion(reduce: boolean) {
+  if (reduce) document.documentElement.dataset.motion = 'reduced'
+  else delete document.documentElement.dataset.motion
+}
+
 export const useSettings = create<SettingsState>((set, get) => ({
   settings: DEFAULT_SETTINGS,
   loaded: false,
@@ -67,12 +72,14 @@ export const useSettings = create<SettingsState>((set, get) => ({
     const stored = await kvGet<Partial<Settings>>('settings')
     const settings = merge(DEFAULT_SETTINGS, (stored ?? {}) as DeepPartial<Settings>)
     applyAccent(settings.accent)
+    applyMotion(settings.reduceMotion)
     set({ settings, loaded: true })
   },
   update: async (patch) => {
     const settings = merge(get().settings, patch)
     set({ settings })
     if (patch.accent) applyAccent(settings.accent)
+    if (patch.reduceMotion !== undefined) applyMotion(settings.reduceMotion)
     await kvSet('settings', settings)
   },
 }))

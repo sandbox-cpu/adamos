@@ -82,7 +82,14 @@ export interface GeneratedImage {
   provider: ImageProviderId
 }
 
-export async function generateImage(opts: { prompt: string; width: number; height: number; seed?: number; provider?: ImageProviderId; signal?: AbortSignal }): Promise<GeneratedImage> {
+export async function generateImage(opts: {
+  prompt: string
+  width: number
+  height: number
+  seed?: number
+  provider?: ImageProviderId
+  signal?: AbortSignal
+}): Promise<GeneratedImage> {
   const settings = useSettings.getState().settings
   const provider = opts.provider ?? settings.media.provider
   const seed = opts.seed ?? Math.floor(Math.random() * 1_000_000)
@@ -92,7 +99,8 @@ export async function generateImage(opts: { prompt: string; width: number; heigh
     const url = pollinationsUrl(opts.prompt, opts.width, opts.height, seed, token)
     try {
       const res = await fetch(url, { signal: opts.signal })
-      if (res.status === 429) throw new FriendlyError('The free image service is busy right now.', 'Wait a few seconds and try again, or add a free Hugging Face token in the Vault.')
+      if (res.status === 429)
+        throw new FriendlyError('The free image service is busy right now.', 'Wait a few seconds and try again, or add a free Hugging Face token in the Vault.')
       if (!res.ok) throw httpError('Pollinations', res.status, await res.text().catch(() => ''))
       const blob = await res.blob()
       if (!blob.type.startsWith('image/')) throw new FriendlyError('The free image service didn’t return an image.', 'Try again in a moment.')
@@ -163,7 +171,14 @@ export async function saveMedia(item: Omit<MediaItem, 'id' | 'createdAt'>): Prom
   return media
 }
 
-export async function generateAndSaveImage(opts: { prompt: string; styleId: string; aspectId: string; provider?: ImageProviderId; signal?: AbortSignal; projectId?: string }): Promise<MediaItem> {
+export async function generateAndSaveImage(opts: {
+  prompt: string
+  styleId: string
+  aspectId: string
+  provider?: ImageProviderId
+  signal?: AbortSignal
+  projectId?: string
+}): Promise<MediaItem> {
   const aspect = aspectById(opts.aspectId)
   const img = await generateImage({ prompt: fullPrompt(opts.prompt, opts.styleId), width: aspect.width, height: aspect.height, provider: opts.provider, signal: opts.signal })
   const media = await saveMedia({

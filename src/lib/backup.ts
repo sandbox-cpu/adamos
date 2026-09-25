@@ -41,14 +41,18 @@ export async function importEverything(json: string): Promise<number> {
   const parsed = JSON.parse(json) as { format?: string; tables?: Partial<Record<TableName, unknown[]>> }
   if (parsed.format !== 'agentic-os-backup' || !parsed.tables) throw new Error('That file is not a backup from this OS.')
   let count = 0
-  await db.transaction('rw', TABLES.map((t) => db.table(t)), async () => {
-    for (const name of TABLES) {
-      const rows = parsed.tables?.[name]
-      if (!Array.isArray(rows)) continue
-      const safe = name === 'kv' ? rows.filter((r) => !DEVICE_ONLY.has((r as { key: string }).key)) : rows
-      await db.table(name).bulkPut(safe)
-      count += safe.length
-    }
-  })
+  await db.transaction(
+    'rw',
+    TABLES.map((t) => db.table(t)),
+    async () => {
+      for (const name of TABLES) {
+        const rows = parsed.tables?.[name]
+        if (!Array.isArray(rows)) continue
+        const safe = name === 'kv' ? rows.filter((r) => !DEVICE_ONLY.has((r as { key: string }).key)) : rows
+        await db.table(name).bulkPut(safe)
+        count += safe.length
+      }
+    },
+  )
   return count
 }

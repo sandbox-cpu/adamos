@@ -25,7 +25,19 @@ function SrTable({ caption, rows }: { caption: string; rows: [string, string][] 
 /*  Sparkline: trend inside a stat tile                                */
 /* ------------------------------------------------------------------ */
 
-export function Sparkline({ values, labels, height = 44, format = (v: number) => String(v), caption }: { values: number[]; labels: string[]; height?: number; format?: (v: number) => string; caption: string }) {
+export function Sparkline({
+  values,
+  labels,
+  height = 44,
+  format = (v: number) => String(v),
+  caption,
+}: {
+  values: number[]
+  labels: string[]
+  height?: number
+  format?: (v: number) => string
+  caption: string
+}) {
   const [hover, setHover] = useState<number | null>(null)
   const ref = useRef<SVGSVGElement>(null)
   const width = 220
@@ -45,14 +57,25 @@ export function Sparkline({ values, labels, height = 44, format = (v: number) =>
   const hi = hover ?? null
   return (
     <div className="relative">
-      <svg ref={ref} viewBox={`0 0 ${width} ${height}`} className="h-auto w-full overflow-visible" onPointerMove={onMove} onPointerLeave={() => setHover(null)} role="img" aria-label={caption}>
+      <svg
+        ref={ref}
+        viewBox={`0 0 ${width} ${height}`}
+        className="h-auto w-full overflow-visible"
+        onPointerMove={onMove}
+        onPointerLeave={() => setHover(null)}
+        role="img"
+        aria-label={caption}
+      >
         <path d={path} fill="none" stroke={ink.muted} strokeWidth={2} strokeLinejoin="round" strokeLinecap="round" vectorEffect="non-scaling-stroke" />
         {hi !== null && <line x1={x(hi)} x2={x(hi)} y1={2} y2={height - 2} stroke={ink.baseline} strokeWidth={1} vectorEffect="non-scaling-stroke" />}
         <circle cx={x(last)} cy={y(values[last] ?? 0)} r={4} fill="var(--accent)" stroke={ink.surface} strokeWidth={2} vectorEffect="non-scaling-stroke" />
         {hi !== null && hi !== last && <circle cx={x(hi)} cy={y(values[hi])} r={4} fill={ink.secondary} stroke={ink.surface} strokeWidth={2} vectorEffect="non-scaling-stroke" />}
       </svg>
       {hi !== null && (
-        <div className="pointer-events-none absolute -top-9 rounded-lg border border-white/10 bg-ink-800 px-2 py-1 text-[11px] whitespace-nowrap shadow-xl" style={{ left: `${(x(hi) / width) * 100}%`, transform: 'translateX(-50%)' }}>
+        <div
+          className="pointer-events-none absolute -top-9 rounded-lg border border-white/10 bg-ink-800 px-2 py-1 text-[11px] whitespace-nowrap shadow-xl"
+          style={{ left: `${(x(hi) / width) * 100}%`, transform: 'translateX(-50%)' }}
+        >
           <span className="font-semibold text-fg">{format(values[hi])}</span> <span className="text-muted">{labels[hi]}</span>
         </div>
       )}
@@ -73,7 +96,19 @@ function niceMax(v: number): number {
   return nice * exp
 }
 
-export function ColumnChart({ data, height = 180, format = formatNumber, caption, color = SERIES_DARK[0] }: { data: { label: string; value: number }[]; height?: number; format?: (v: number) => string; caption: string; color?: string }) {
+export function ColumnChart({
+  data,
+  height = 180,
+  format = formatNumber,
+  caption,
+  color = SERIES_DARK[0],
+}: {
+  data: { label: string; value: number }[]
+  height?: number
+  format?: (v: number) => string
+  caption: string
+  color?: string
+}) {
   const [hover, setHover] = useState<number | null>(null)
   const id = useId()
   const width = 560
@@ -105,9 +140,18 @@ export function ColumnChart({ data, height = 180, format = formatNumber, caption
           const r = Math.min(4, h / 2, barW / 2)
           const x0 = cx - barW / 2
           const y0 = y(d.value)
-          const barPath = h > 0 ? `M${x0},${y(0)} L${x0},${y0 + r} Q${x0},${y0} ${x0 + r},${y0} L${x0 + barW - r},${y0} Q${x0 + barW},${y0} ${x0 + barW},${y0 + r} L${x0 + barW},${y(0)} Z` : ''
+          const barPath =
+            h > 0 ? `M${x0},${y(0)} L${x0},${y0 + r} Q${x0},${y0} ${x0 + r},${y0} L${x0 + barW - r},${y0} Q${x0 + barW},${y0} ${x0 + barW},${y0 + r} L${x0 + barW},${y(0)} Z` : ''
           return (
-            <g key={d.label} onPointerEnter={() => setHover(i)} onPointerLeave={() => setHover(null)} tabIndex={0} onFocus={() => setHover(i)} onBlur={() => setHover(null)} style={{ outline: 'none' }}>
+            <g
+              key={d.label}
+              onPointerEnter={() => setHover(i)}
+              onPointerLeave={() => setHover(null)}
+              tabIndex={0}
+              onFocus={() => setHover(i)}
+              onBlur={() => setHover(null)}
+              style={{ outline: 'none' }}
+            >
               <rect x={cx - band / 2} y={top} width={band} height={plotH + bottom} fill="transparent" />
               {barPath && <path d={barPath} fill={color} opacity={hover === null || hover === i ? 1 : 0.55} />}
               {(i === peak || hover === i) && d.value > 0 && (
@@ -145,7 +189,14 @@ export function SentimentBar({ positive, neutral, negative }: { positive: number
     <div>
       <div className="flex h-3 w-full gap-[2px] overflow-hidden rounded-full" role="img" aria-label={`Sentiment: ${positive} positive, ${neutral} neutral, ${negative} negative`}>
         {segs.map((s) =>
-          s.value > 0 ? <div key={s.key} title={`${s.key}: ${s.value}`} style={{ width: `${(s.value / total) * 100}%`, background: s.color }} className="h-full first:rounded-l-full last:rounded-r-full" /> : null,
+          s.value > 0 ? (
+            <div
+              key={s.key}
+              title={`${s.key}: ${s.value}`}
+              style={{ width: `${(s.value / total) * 100}%`, background: s.color }}
+              className="h-full first:rounded-l-full last:rounded-r-full"
+            />
+          ) : null,
         )}
       </div>
       <div className="mt-2.5 flex flex-wrap gap-x-4 gap-y-1 text-xs text-soft">

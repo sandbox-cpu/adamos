@@ -20,7 +20,12 @@ function LockHero({ status }: { status: string }) {
   const open = status === 'unlocked'
   return (
     <div className="relative grid size-24 place-items-center">
-      <motion.div className="absolute inset-0 rounded-[30%]" animate={{ rotate: 360 }} transition={{ duration: 18, repeat: Infinity, ease: 'linear' }} style={{ background: 'conic-gradient(from 0deg, var(--accent), var(--accent-2), var(--accent-3), var(--accent))', opacity: 0.55, filter: 'blur(14px)' }} />
+      <motion.div
+        className="absolute inset-0 rounded-[30%]"
+        animate={{ rotate: 360 }}
+        transition={{ duration: 18, repeat: Infinity, ease: 'linear' }}
+        style={{ background: 'conic-gradient(from 0deg, var(--accent), var(--accent-2), var(--accent-3), var(--accent))', opacity: 0.55, filter: 'blur(14px)' }}
+      />
       <div className="relative grid size-20 place-items-center rounded-[28%] border border-white/15 bg-ink-900">
         {open ? <LockOpen className="size-9 text-good" /> : <Lock className="size-9 text-fg" />}
       </div>
@@ -41,14 +46,19 @@ function SetupVault() {
         <LockHero status="uninitialized" />
       </div>
       <h2 className="mt-6 font-display text-2xl font-semibold">Create your vault</h2>
-      <p className="mx-auto mt-2 max-w-md text-sm text-muted">Your API keys are locked with a password only you know. They’re encrypted on this device and never sent anywhere except the service they belong to.</p>
+      <p className="mx-auto mt-2 max-w-md text-sm text-muted">
+        Your API keys are locked with a password only you know. They’re encrypted on this device and never sent anywhere except the service they belong to.
+      </p>
       <div className="mt-6 space-y-3 text-left">
         <Input type="password" placeholder="Choose a vault password" value={pass} onChange={(e) => setPass(e.target.value)} />
         <Input type="password" placeholder="Type it again" value={pass2} onChange={(e) => setPass2(e.target.value)} />
         <div className="flex items-center gap-2">
           <div className="flex flex-1 gap-1">
             {[1, 2, 3, 4].map((n) => (
-              <div key={n} className={cn('h-1 flex-1 rounded-full', strength.score >= n ? (strength.score >= 3 ? 'bg-good' : strength.score === 2 ? 'bg-warn' : 'bg-bad') : 'bg-white/10')} />
+              <div
+                key={n}
+                className={cn('h-1 flex-1 rounded-full', strength.score >= n ? (strength.score >= 3 ? 'bg-good' : strength.score === 2 ? 'bg-warn' : 'bg-bad') : 'bg-white/10')}
+              />
             ))}
           </div>
           <span className="w-16 text-right text-[11px] text-muted">{pass ? strength.label : ''}</span>
@@ -138,7 +148,12 @@ function SecretRow({ secret, usedBy, onEdit }: { secret: VaultSecret; usedBy: nu
       </div>
       <code className="max-w-[260px] truncate rounded-lg bg-black/30 px-2.5 py-1 font-mono text-xs text-soft">{shown ?? `••••••••${secret.hint}`}</code>
       <div className="flex items-center gap-1">
-        <button onClick={() => void show()} className="grid size-8 place-items-center rounded-lg text-muted hover:bg-white/[0.07] hover:text-fg" aria-label={shown ? 'Hide' : 'Reveal'} title={shown ? 'Hide' : 'Reveal for 12 seconds'}>
+        <button
+          onClick={() => void show()}
+          className="grid size-8 place-items-center rounded-lg text-muted hover:bg-white/[0.07] hover:text-fg"
+          aria-label={shown ? 'Hide' : 'Reveal'}
+          title={shown ? 'Hide' : 'Reveal for 12 seconds'}
+        >
           {shown ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
         </button>
         <button
@@ -218,7 +233,11 @@ function SecretModal({ open, onClose, editing }: { open: boolean; onClose: () =>
               onClick={async () => {
                 setBusy(true)
                 try {
-                  const clean = Object.fromEntries(Object.entries(values).filter(([, v]) => v.trim()).map(([k, v]) => [k, v.trim()]))
+                  const clean = Object.fromEntries(
+                    Object.entries(values)
+                      .filter(([, v]) => v.trim())
+                      .map(([k, v]) => [k, v.trim()]),
+                  )
                   if (editing) await updateSecret(editing.id, { label: label || editing.label, values: Object.keys(clean).length ? clean : undefined })
                   else await addSecret({ service: service.id, label: label || `${service.name} key`, values: clean })
                   toast.success(editing ? 'Key updated' : 'Key saved', 'Encrypted in your vault.')
@@ -243,7 +262,11 @@ function SecretModal({ open, onClose, editing }: { open: boolean; onClose: () =>
               <div className="mb-2 text-[11px] font-semibold tracking-[0.16em] text-faint uppercase">{cat}</div>
               <div className="grid gap-2 sm:grid-cols-3">
                 {list.map((s) => (
-                  <button key={s.id} onClick={() => setService(s)} className="flex items-center gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.02] p-3 text-left transition hover:border-white/20 hover:bg-white/[0.05]">
+                  <button
+                    key={s.id}
+                    onClick={() => setService(s)}
+                    className="flex items-center gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.02] p-3 text-left transition hover:border-white/20 hover:bg-white/[0.05]"
+                  >
                     <ServiceMark id={s.id} size={30} />
                     <span className="truncate text-sm">{s.name}</span>
                   </button>
@@ -271,7 +294,12 @@ function SecretModal({ open, onClose, editing }: { open: boolean; onClose: () =>
             </Field>
           ))}
           {service.helpUrl && (
-            <a href={service.helpUrl} target="_blank" rel="noopener noreferrer" className="inline-flex text-[13px] font-medium text-[color-mix(in_oklab,var(--accent)_60%,white)] hover:underline">
+            <a
+              href={service.helpUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex text-[13px] font-medium text-[color-mix(in_oklab,var(--accent)_60%,white)] hover:underline"
+            >
               Where do I find this?
             </a>
           )}
@@ -313,7 +341,12 @@ function Security() {
         </li>
       </ul>
       <div className="space-y-4 border-t border-white/[0.06] pt-5">
-        <Toggle checked={remembered} onChange={(v) => void setRemember(v)} label="Keep unlocked on this computer" description="When off, you’ll be asked for your password after a period of inactivity." />
+        <Toggle
+          checked={remembered}
+          onChange={(v) => void setRemember(v)}
+          label="Keep unlocked on this computer"
+          description="When off, you’ll be asked for your password after a period of inactivity."
+        />
         {!remembered && (
           <Field label="Lock automatically after">
             <Select

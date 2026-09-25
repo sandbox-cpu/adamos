@@ -31,7 +31,10 @@ export function ProjectCard({ project, tasks, agents, compact }: { project: Proj
       onClick={() => navigate(`/projects/${project.id}`)}
       className={cn('glass group relative flex w-full flex-col overflow-hidden rounded-3xl text-left transition-colors hover:border-white/15', compact ? 'p-4' : 'p-5')}
     >
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-24 opacity-60 transition group-hover:opacity-90" style={{ background: `radial-gradient(120% 100% at 0% 0%, ${project.color}33, transparent 70%)` }} />
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-24 opacity-60 transition group-hover:opacity-90"
+        style={{ background: `radial-gradient(120% 100% at 0% 0%, ${project.color}33, transparent 70%)` }}
+      />
       <div className="relative flex items-start justify-between gap-3">
         <div className="min-w-0">
           <div className="mb-1 flex items-center gap-2 text-xs text-muted">

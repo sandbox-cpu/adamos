@@ -23,7 +23,10 @@ function toStringList(value: unknown): string[] {
 
 /** Removes fenced and inline code so tags and links inside code are ignored. */
 function stripCode(text: string): string {
-  return text.replace(/```[\s\S]*?```/g, ' ').replace(/~~~[\s\S]*?~~~/g, ' ').replace(/`[^`\n]*`/g, ' ')
+  return text
+    .replace(/```[\s\S]*?```/g, ' ')
+    .replace(/~~~[\s\S]*?~~~/g, ' ')
+    .replace(/`[^`\n]*`/g, ' ')
 }
 
 export function parseMarkdown(raw: string): ParsedNote {

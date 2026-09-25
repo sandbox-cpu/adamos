@@ -177,7 +177,11 @@ export function ConnectAIFlow({ existing, onDone, onCancel }: { existing?: AIPro
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 font-semibold text-fg">
                     {p.name}
-                    {p.id === 'anthropic' && <span className="rounded-full bg-[color-mix(in_oklab,var(--accent)_20%,transparent)] px-2 py-0.5 text-[10px] font-semibold text-[color-mix(in_oklab,var(--accent)_60%,white)]">RECOMMENDED</span>}
+                    {p.id === 'anthropic' && (
+                      <span className="rounded-full bg-[color-mix(in_oklab,var(--accent)_20%,transparent)] px-2 py-0.5 text-[10px] font-semibold text-[color-mix(in_oklab,var(--accent)_60%,white)]">
+                        RECOMMENDED
+                      </span>
+                    )}
                   </div>
                   <div className="text-xs text-faint">{p.company}</div>
                   <p className="mt-1.5 text-[13px] leading-snug text-muted">{p.blurb}</p>
@@ -196,7 +200,11 @@ export function ConnectAIFlow({ existing, onDone, onCancel }: { existing?: AIPro
           {more && (
             <div className="mt-3 grid gap-2 sm:grid-cols-3">
               {others.map((p) => (
-                <button key={p.id} onClick={() => chooseProvider(p)} className="flex items-center gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.02] p-3 text-left text-sm transition hover:border-white/20">
+                <button
+                  key={p.id}
+                  onClick={() => chooseProvider(p)}
+                  className="flex items-center gap-2.5 rounded-xl border border-white/[0.07] bg-white/[0.02] p-3 text-left text-sm transition hover:border-white/20"
+                >
                   <ServiceMark id={p.id} size={30} />
                   <span className="min-w-0">
                     <span className="block truncate text-fg">{p.name}</span>
@@ -255,13 +263,30 @@ export function ConnectAIFlow({ existing, onDone, onCancel }: { existing?: AIPro
                     </ol>
                   )}
                   {info.keyUrl && (
-                    <a href={info.keyUrl} target="_blank" rel="noopener noreferrer" className="mb-3 inline-flex items-center gap-1.5 text-[13px] font-medium text-[color-mix(in_oklab,var(--accent)_60%,white)] hover:underline">
+                    <a
+                      href={info.keyUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mb-3 inline-flex items-center gap-1.5 text-[13px] font-medium text-[color-mix(in_oklab,var(--accent)_60%,white)] hover:underline"
+                    >
                       Get a key <ExternalLink className="size-3.5" />
                     </a>
                   )}
                   <div className="relative">
-                    <Input type={showKey ? 'text' : 'password'} value={key} onChange={(e) => setKey(e.target.value)} placeholder={info.keyPlaceholder ?? 'Paste your key'} className="pr-10 font-mono text-[13px]" autoComplete="off" spellCheck={false} />
-                    <button onClick={() => setShowKey((s) => !s)} className="absolute top-1/2 right-2 grid size-7 -translate-y-1/2 place-items-center rounded-lg text-muted hover:text-fg" aria-label={showKey ? 'Hide key' : 'Show key'}>
+                    <Input
+                      type={showKey ? 'text' : 'password'}
+                      value={key}
+                      onChange={(e) => setKey(e.target.value)}
+                      placeholder={info.keyPlaceholder ?? 'Paste your key'}
+                      className="pr-10 font-mono text-[13px]"
+                      autoComplete="off"
+                      spellCheck={false}
+                    />
+                    <button
+                      onClick={() => setShowKey((s) => !s)}
+                      className="absolute top-1/2 right-2 grid size-7 -translate-y-1/2 place-items-center rounded-lg text-muted hover:text-fg"
+                      aria-label={showKey ? 'Hide key' : 'Show key'}
+                    >
                       {showKey ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                     </button>
                   </div>
@@ -284,14 +309,25 @@ export function ConnectAIFlow({ existing, onDone, onCancel }: { existing?: AIPro
               <div className="mt-2 flex items-center gap-2">
                 <div className="flex flex-1 gap-1">
                   {[1, 2, 3, 4].map((n) => (
-                    <div key={n} className={cn('h-1 flex-1 rounded-full', strength.score >= n ? (strength.score >= 3 ? 'bg-good' : strength.score === 2 ? 'bg-warn' : 'bg-bad') : 'bg-white/10')} />
+                    <div
+                      key={n}
+                      className={cn(
+                        'h-1 flex-1 rounded-full',
+                        strength.score >= n ? (strength.score >= 3 ? 'bg-good' : strength.score === 2 ? 'bg-warn' : 'bg-bad') : 'bg-white/10',
+                      )}
+                    />
                   ))}
                 </div>
                 <span className="text-[11px] text-muted">{pass ? strength.label : ''}</span>
               </div>
               {pass2 && pass !== pass2 && <p className="mt-1.5 text-xs text-bad">The passwords don’t match yet.</p>}
               <div className="mt-3">
-                <Toggle checked={remember} onChange={setRemember} label="Keep unlocked on this computer" description="Recommended on your own device. Turn off to be asked each time." />
+                <Toggle
+                  checked={remember}
+                  onChange={setRemember}
+                  label="Keep unlocked on this computer"
+                  description="Recommended on your own device. Turn off to be asked each time."
+                />
               </div>
             </div>
           )}
@@ -334,7 +370,12 @@ export function ConnectAIFlow({ existing, onDone, onCancel }: { existing?: AIPro
                 <button
                   key={d}
                   onClick={() => setDepth(d)}
-                  className={cn('rounded-2xl border px-3 py-2.5 text-left transition', depth === d ? 'border-[color-mix(in_oklab,var(--accent)_60%,transparent)] bg-[color-mix(in_oklab,var(--accent)_12%,transparent)]' : 'border-white/[0.08] bg-white/[0.02] hover:border-white/20')}
+                  className={cn(
+                    'rounded-2xl border px-3 py-2.5 text-left transition',
+                    depth === d
+                      ? 'border-[color-mix(in_oklab,var(--accent)_60%,transparent)] bg-[color-mix(in_oklab,var(--accent)_12%,transparent)]'
+                      : 'border-white/[0.08] bg-white/[0.02] hover:border-white/20',
+                  )}
                 >
                   <div className="text-sm font-medium">{DEPTH_LABELS[d].label}</div>
                   <div className="text-[11px] leading-snug text-muted">{DEPTH_LABELS[d].hint}</div>
@@ -343,7 +384,9 @@ export function ConnectAIFlow({ existing, onDone, onCancel }: { existing?: AIPro
             </div>
           </div>
 
-          {info.webSearch && <Toggle checked={webSearch} onChange={setWebSearch} label="Allow live web research" description="Research agents can search the web and cite sources." />}
+          {info.webSearch && (
+            <Toggle checked={webSearch} onChange={setWebSearch} label="Allow live web research" description="Research agents can search the web and cite sources." />
+          )}
 
           <div>
             <button onClick={() => setAdvanced((a) => !a)} className="flex items-center gap-1.5 text-xs text-muted hover:text-fg">

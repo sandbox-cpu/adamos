@@ -101,7 +101,12 @@ export function Composer({ onSend, onStop, running, placeholder = 'Message…', 
     <div className="relative">
       <AnimatePresence>
         {mentionOptions.length > 0 && (
-          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6 }} className="glass-strong absolute bottom-full left-0 z-20 mb-2 w-64 rounded-2xl p-1.5">
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 6 }}
+            className="glass-strong absolute bottom-full left-0 z-20 mb-2 w-64 rounded-2xl p-1.5"
+          >
             {mentionOptions.map((a) => (
               <button key={a.id} onClick={() => insertMention(a)} className="flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2 text-left text-sm hover:bg-white/[0.07]">
                 <AgentAvatar agent={a} size="sm" />
@@ -111,7 +116,12 @@ export function Composer({ onSend, onStop, running, placeholder = 'Message…', 
           </motion.div>
         )}
         {picker !== 'none' && (
-          <motion.div initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 6 }} className="glass-strong absolute bottom-full left-0 z-20 mb-2 w-80 rounded-2xl p-2">
+          <motion.div
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 6 }}
+            className="glass-strong absolute bottom-full left-0 z-20 mb-2 w-80 rounded-2xl p-2"
+          >
             {picker === 'menu' && (
               <>
                 <button onClick={() => setPicker('notes')} className="flex w-full items-center gap-2.5 rounded-xl px-3 py-2.5 text-left text-sm hover:bg-white/[0.07]">
@@ -124,7 +134,13 @@ export function Composer({ onSend, onStop, running, placeholder = 'Message…', 
             )}
             {picker === 'notes' && (
               <>
-                <input autoFocus value={noteQuery} onChange={(e) => setNoteQuery(e.target.value)} placeholder="Search notes…" className="mb-1.5 h-9 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm outline-none" />
+                <input
+                  autoFocus
+                  value={noteQuery}
+                  onChange={(e) => setNoteQuery(e.target.value)}
+                  placeholder="Search notes…"
+                  className="mb-1.5 h-9 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 text-sm outline-none"
+                />
                 <div className="max-h-64 overflow-y-auto">
                   {noteResults.map((n) => (
                     <button
@@ -215,12 +231,18 @@ export function Composer({ onSend, onStop, running, placeholder = 'Message…', 
             }}
             onKeyDown={onKeyDown}
             placeholder={dictation.listening ? 'Listening… speak now' : placeholder}
-            className={cn('max-h-[220px] min-h-[40px] flex-1 resize-none bg-transparent px-2 py-2 text-[14.5px] leading-relaxed text-fg outline-none placeholder:text-faint', compact && 'text-sm')}
+            className={cn(
+              'max-h-[220px] min-h-[40px] flex-1 resize-none bg-transparent px-2 py-2 text-[14.5px] leading-relaxed text-fg outline-none placeholder:text-faint',
+              compact && 'text-sm',
+            )}
           />
           {dictation.supported && (
             <button
               onClick={dictation.toggle}
-              className={cn('mb-0.5 grid size-9 shrink-0 place-items-center rounded-2xl transition', dictation.listening ? 'bg-bad/15 text-bad' : 'text-muted hover:bg-white/[0.07] hover:text-fg')}
+              className={cn(
+                'mb-0.5 grid size-9 shrink-0 place-items-center rounded-2xl transition',
+                dictation.listening ? 'bg-bad/15 text-bad' : 'text-muted hover:bg-white/[0.07] hover:text-fg',
+              )}
               aria-label={dictation.listening ? 'Stop dictation' : 'Dictate'}
               title={dictation.listening ? 'Stop dictation' : 'Speak instead of typing'}
             >

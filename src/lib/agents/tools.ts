@@ -3,18 +3,7 @@ import { db } from '../db'
 import { searchBrain, getNote } from '../brain/search'
 import { appendToDailyNote, saveNewNote } from '../brain/vault-fs'
 import type { ToolCall, ToolOutcome, ToolSpec } from '../llm/types'
-import {
-  createEvent,
-  createProject,
-  createTask,
-  eventsBetween,
-  findAgentByName,
-  findProject,
-  findTask,
-  logActivity,
-  MINUTES_SAVED,
-  updateTask,
-} from '../ops'
+import { createEvent, createProject, createTask, eventsBetween, findAgentByName, findProject, findTask, logActivity, MINUTES_SAVED, updateTask } from '../ops'
 import type { ActivityItem, Agent, AgentTool, Priority, ProjectStatus, Settings, TaskStatus } from '../types'
 import { truncate, uid } from '../utils'
 
@@ -452,7 +441,7 @@ async function executeTool(call: ToolCall, ctx: ToolContext): Promise<ToolOutcom
         content: JSON.stringify(
           events.map((e) => ({
             title: e.title,
-            start: e.allDay ? e.start.slice(0, 10) : format(new Date(e.start), "yyyy-MM-dd HH:mm"),
+            start: e.allDay ? e.start.slice(0, 10) : format(new Date(e.start), 'yyyy-MM-dd HH:mm'),
             end: e.allDay ? undefined : format(new Date(e.end), 'HH:mm'),
             all_day: e.allDay || undefined,
             location: e.location,
@@ -476,7 +465,7 @@ async function executeTool(call: ToolCall, ctx: ToolContext): Promise<ToolOutcom
         location: str(input.location) || undefined,
         description: str(input.notes) || undefined,
       })
-      finish(item, { detail: format(start, "EEE d MMM, HH:mm"), link: `/calendar?date=${date}` })
+      finish(item, { detail: format(start, 'EEE d MMM, HH:mm'), link: `/calendar?date=${date}` })
       return { content: `Added "${ev.title}" on ${format(start, 'EEEE d MMMM')} at ${format(start, 'HH:mm')} for ${minutes} minutes.` }
     }
     case 'delegate_to_agent': {
@@ -484,7 +473,13 @@ async function executeTool(call: ToolCall, ctx: ToolContext): Promise<ToolOutcom
       const teammate = await findAgentByName(name)
       if (!teammate || teammate.id === ctx.agent.id) {
         const agents = await db.agents.toArray()
-        return { content: `No teammate called "${name}". Available: ${agents.filter((a) => a.id !== ctx.agent.id).map((a) => a.name).join(', ')}.`, isError: true }
+        return {
+          content: `No teammate called "${name}". Available: ${agents
+            .filter((a) => a.id !== ctx.agent.id)
+            .map((a) => a.name)
+            .join(', ')}.`,
+          isError: true,
+        }
       }
       if (ctx.delegateBudget.remaining <= 0 || !ctx.runDelegate) {
         return { content: 'Delegation limit reached for this request. Finish the work yourself.', isError: true }

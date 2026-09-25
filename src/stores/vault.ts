@@ -1,13 +1,6 @@
 import { create } from 'zustand'
 import { db, kvDelete, kvGet, kvSet } from '../lib/db'
-import {
-  createVault,
-  decryptJSON,
-  encryptJSON,
-  secretHint,
-  unlockVault,
-  verifyKey,
-} from '../lib/crypto'
+import { createVault, decryptJSON, encryptJSON, secretHint, unlockVault, verifyKey } from '../lib/crypto'
 import type { VaultMeta, VaultSecret } from '../lib/types'
 import { uid } from '../lib/utils'
 
@@ -200,9 +193,7 @@ export const useVault = create<VaultState>((set, get) => ({
     const secrets = await db.secrets.toArray()
     const plain = await Promise.all(secrets.map((s) => decryptJSON<Record<string, string>>(oldKey, s.data)))
     const { meta: nextMeta, key: nextKey } = await createVault(next)
-    const reEncrypted = await Promise.all(
-      secrets.map(async (s, i) => ({ ...s, data: await encryptJSON(nextKey, plain[i]), updatedAt: Date.now() })),
-    )
+    const reEncrypted = await Promise.all(secrets.map(async (s, i) => ({ ...s, data: await encryptJSON(nextKey, plain[i]), updatedAt: Date.now() })))
     await db.transaction('rw', db.kv, db.secrets, async () => {
       await db.secrets.bulkPut(reEncrypted)
       await db.kv.put({ key: META_KEY, value: nextMeta })

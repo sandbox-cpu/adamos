@@ -106,7 +106,13 @@ function clean(v: unknown, max = 400): string {
 export function normaliseSlide(raw: unknown, keep?: Slide): Slide {
   const r = (raw ?? {}) as Record<string, unknown>
   let layout = (LAYOUT_IDS.includes(r.layout as SlideLayout) ? r.layout : 'bullets') as SlideLayout
-  const list = (v: unknown, n: number) => (Array.isArray(v) ? v.map((x) => clean(x, 220)).filter(Boolean).slice(0, n) : undefined)
+  const list = (v: unknown, n: number) =>
+    Array.isArray(v)
+      ? v
+          .map((x) => clean(x, 220))
+          .filter(Boolean)
+          .slice(0, n)
+      : undefined
   const slide: Slide = {
     id: keep?.id ?? uid(),
     layout,
@@ -122,14 +128,20 @@ export function normaliseSlide(raw: unknown, keep?: Slide): Slide {
     slide.columns = (r.columns as Record<string, unknown>[]).slice(0, 3).map((c) => ({ heading: clean(c?.heading, 80), bullets: list(c?.bullets, 6) ?? [] }))
   }
   if (Array.isArray(r.stats)) {
-    slide.stats = (r.stats as Record<string, unknown>[]).slice(0, 4).map((s) => ({ value: clean(s?.value, 24), label: clean(s?.label, 120) })).filter((s) => s.value)
+    slide.stats = (r.stats as Record<string, unknown>[])
+      .slice(0, 4)
+      .map((s) => ({ value: clean(s?.value, 24), label: clean(s?.label, 120) }))
+      .filter((s) => s.value)
   }
   if (r.quote && typeof r.quote === 'object') {
     const q = r.quote as Record<string, unknown>
     if (clean(q.text)) slide.quote = { text: clean(q.text, 400), author: clean(q.author, 80) || undefined, role: clean(q.role, 80) || undefined }
   }
   if (Array.isArray(r.items)) {
-    slide.items = (r.items as Record<string, unknown>[]).slice(0, 7).map((i) => ({ label: clean(i?.label, 90), detail: clean(i?.detail, 200) || undefined })).filter((i) => i.label)
+    slide.items = (r.items as Record<string, unknown>[])
+      .slice(0, 7)
+      .map((i) => ({ label: clean(i?.label, 90), detail: clean(i?.detail, 200) || undefined }))
+      .filter((i) => i.label)
   }
   if (r.chart && typeof r.chart === 'object') {
     const c = r.chart as Record<string, unknown>
@@ -167,7 +179,12 @@ function demoDeck(brief: DeckBrief, title: string): { title: string; slides: unk
     title,
     slides: [
       { layout: 'title', title, subtitle: brief.audience ? `Prepared for ${brief.audience}` : 'Presentation', notes: `Welcome everyone. Today is about ${topic}.` },
-      { layout: 'agenda', title: 'What we’ll cover', items: [{ label: 'The opportunity' }, { label: 'Our approach' }, { label: 'The plan' }, { label: 'Next steps' }], notes: 'A quick map of the session.' },
+      {
+        layout: 'agenda',
+        title: 'What we’ll cover',
+        items: [{ label: 'The opportunity' }, { label: 'Our approach' }, { label: 'The plan' }, { label: 'Next steps' }],
+        notes: 'A quick map of the session.',
+      },
       { layout: 'section', title: 'The opportunity', subtitle: truncate(topic, 120), notes: 'Set up the context before the recommendation.' },
       { layout: 'bullets', title: 'Why this matters now', bullets: points.slice(0, 4), notes: 'Walk through each point and connect it to the audience’s goals.' },
       {
@@ -179,7 +196,13 @@ function demoDeck(brief: DeckBrief, title: string): { title: string; slides: unk
         ],
         notes: 'Be explicit about the trade-offs.',
       },
-      { layout: 'image', title: 'Bringing it to life', body: 'A single, memorable moment people will talk about and share.', imagePrompt: `${topic}, a memorable real-world moment, people engaged and smiling`, notes: 'Paint the picture of the idea in action.' },
+      {
+        layout: 'image',
+        title: 'Bringing it to life',
+        body: 'A single, memorable moment people will talk about and share.',
+        imagePrompt: `${topic}, a memorable real-world moment, people engaged and smiling`,
+        notes: 'Paint the picture of the idea in action.',
+      },
       {
         layout: 'timeline',
         title: 'The plan',
@@ -191,7 +214,16 @@ function demoDeck(brief: DeckBrief, title: string): { title: string; slides: unk
         ],
         notes: 'Keep momentum with a clear rhythm.',
       },
-      { layout: 'stats', title: 'What success looks like', stats: [{ value: '[X]', label: 'pieces of quality coverage (target)' }, { value: '[Y%]', label: 'uplift in awareness (target)' }, { value: '6', label: 'weeks to first results' }], notes: 'Agree targets together; the placeholders are for us to fill in.' },
+      {
+        layout: 'stats',
+        title: 'What success looks like',
+        stats: [
+          { value: '[X]', label: 'pieces of quality coverage (target)' },
+          { value: '[Y%]', label: 'uplift in awareness (target)' },
+          { value: '6', label: 'weeks to first results' },
+        ],
+        notes: 'Agree targets together; the placeholders are for us to fill in.',
+      },
       { layout: 'closing', title: 'Let’s make it happen', subtitle: 'Next step: agree the plan and start this week.', notes: 'Close with the ask and the next action.' },
     ],
   }
@@ -312,7 +344,16 @@ export async function illustrateDeck(deckId: string, max = 3): Promise<void> {
   }
 }
 
-export async function startDeckFromBrief(input: { title: string; topic: string; audience?: string; slideCount?: number; agentId?: string; projectId?: string; sources?: string; useWeb?: boolean }): Promise<Deck> {
+export async function startDeckFromBrief(input: {
+  title: string
+  topic: string
+  audience?: string
+  slideCount?: number
+  agentId?: string
+  projectId?: string
+  sources?: string
+  useWeb?: boolean
+}): Promise<Deck> {
   const deck = await createDeck({
     title: input.title,
     agentId: input.agentId,
@@ -336,35 +377,44 @@ export async function reviseDeck(deckId: string, instruction: string, signal?: A
   const deck = await db.decks.get(deckId)
   if (!deck) return
   const agent = await deckAgent(deck)
-  await trackJob({ id: `deck-revise:${deckId}`, kind: 'deck', title: `Updating ${deck.title}`, stage: `${agent.name} is editing`, agentId: agent.id, link: `/decks/${deckId}` }, async () => {
-    await db.decks.update(deckId, { status: 'generating', stage: `${agent.name} is updating the deck` })
-    try {
-      const current = { title: deck.title, slides: deck.slides.map(({ id: _id, image: _image, ...rest }) => rest) }
-      const res = await runAgent({
-        agent,
-        mode: 'studio',
-        prompt: `Here is the current deck as JSON:\n${JSON.stringify(current)}\n\nChange request: ${instruction}\n\nReturn the complete updated deck. Keep slides that don’t need to change exactly as they are, in the same order.\n\n${SLIDE_RULES}`,
-        toolAccess: 'none',
-        webSearch: false,
-        thinkingDepth: 'balanced',
-        maxTokens: 24000,
-        json: { name: 'deck', schema: DECK_SCHEMA },
-        demo: { json: () => ({ ...current, slides: current.slides.map((s, i) => (i === 1 ? { ...s, subtitle: `Updated: ${truncate(instruction, 60)}` } : s)) }) },
-        signal,
-      })
-      const data = res.json as { title?: string; slides?: unknown[] }
-      const slides = (data.slides ?? []).map((s, i) => {
-        const prev = deck.slides[i]
-        const next = normaliseSlide(s, prev)
-        return prev && prev.title === next.title ? { ...next, image: prev.image } : { ...next, image: prev?.image && next.layout === 'image' ? prev.image : next.image }
-      })
-      await db.decks.update(deckId, { slides: slides.length ? slides : deck.slides, title: data.title?.trim() || deck.title, status: 'ready', stage: undefined, updatedAt: Date.now() })
-      void illustrateDeck(deckId, 2)
-    } catch (err) {
-      await db.decks.update(deckId, { status: 'ready', stage: undefined })
-      throw err
-    }
-  })
+  await trackJob(
+    { id: `deck-revise:${deckId}`, kind: 'deck', title: `Updating ${deck.title}`, stage: `${agent.name} is editing`, agentId: agent.id, link: `/decks/${deckId}` },
+    async () => {
+      await db.decks.update(deckId, { status: 'generating', stage: `${agent.name} is updating the deck` })
+      try {
+        const current = { title: deck.title, slides: deck.slides.map(({ id: _id, image: _image, ...rest }) => rest) }
+        const res = await runAgent({
+          agent,
+          mode: 'studio',
+          prompt: `Here is the current deck as JSON:\n${JSON.stringify(current)}\n\nChange request: ${instruction}\n\nReturn the complete updated deck. Keep slides that don’t need to change exactly as they are, in the same order.\n\n${SLIDE_RULES}`,
+          toolAccess: 'none',
+          webSearch: false,
+          thinkingDepth: 'balanced',
+          maxTokens: 24000,
+          json: { name: 'deck', schema: DECK_SCHEMA },
+          demo: { json: () => ({ ...current, slides: current.slides.map((s, i) => (i === 1 ? { ...s, subtitle: `Updated: ${truncate(instruction, 60)}` } : s)) }) },
+          signal,
+        })
+        const data = res.json as { title?: string; slides?: unknown[] }
+        const slides = (data.slides ?? []).map((s, i) => {
+          const prev = deck.slides[i]
+          const next = normaliseSlide(s, prev)
+          return prev && prev.title === next.title ? { ...next, image: prev.image } : { ...next, image: prev?.image && next.layout === 'image' ? prev.image : next.image }
+        })
+        await db.decks.update(deckId, {
+          slides: slides.length ? slides : deck.slides,
+          title: data.title?.trim() || deck.title,
+          status: 'ready',
+          stage: undefined,
+          updatedAt: Date.now(),
+        })
+        void illustrateDeck(deckId, 2)
+      } catch (err) {
+        await db.decks.update(deckId, { status: 'ready', stage: undefined })
+        throw err
+      }
+    },
+  )
 }
 
 export async function reviseSlide(deckId: string, slideId: string, instruction: string, signal?: AbortSignal): Promise<void> {

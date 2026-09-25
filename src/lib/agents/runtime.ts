@@ -151,7 +151,16 @@ export async function runAgent(o: AgentRunOptions): Promise<AgentRunResult> {
         }
         case 'web_results': {
           const item = webActivities.get(e.id)
-          if (item) report({ ...item, status: 'done', detail: `${e.results.length} results`, output: e.results.slice(0, 4).map((r) => r.title ?? r.url).join(' · ') })
+          if (item)
+            report({
+              ...item,
+              status: 'done',
+              detail: `${e.results.length} results`,
+              output: e.results
+                .slice(0, 4)
+                .map((r) => r.title ?? r.url)
+                .join(' · '),
+            })
           break
         }
       }

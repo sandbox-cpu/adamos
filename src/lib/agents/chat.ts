@@ -21,7 +21,7 @@ export async function startConversation(input: { kind: ConversationKind; agentId
   const conv: Conversation = {
     id: uid(),
     kind: input.kind,
-    title: input.title?.trim() || (input.kind === 'group' ? input.topic?.trim() || names.join(', ') : names[0] ?? 'Chat'),
+    title: input.title?.trim() || (input.kind === 'group' ? input.topic?.trim() || names.join(', ') : (names[0] ?? 'Chat')),
     agentIds: input.agentIds,
     topic: input.topic,
     projectId: input.projectId,
@@ -164,7 +164,10 @@ async function attachmentContext(att?: Attachments): Promise<string | undefined>
       const tasks = await db.tasks.where('projectId').equals(p.id).toArray()
       parts.push(
         `Project in focus: ${p.name}${p.client ? ` (client: ${p.client})` : ''}\nStatus: ${p.status}${p.dueDate ? `, due ${p.dueDate}` : ''}\n${p.description ?? ''}\nGoals: ${p.goals.join('; ') || 'not set'}\nOpen tasks: ${
-          tasks.filter((t) => t.status !== 'done').map((t) => t.title).join('; ') || 'none'
+          tasks
+            .filter((t) => t.status !== 'done')
+            .map((t) => t.title)
+            .join('; ') || 'none'
         }`,
       )
     }

@@ -27,7 +27,14 @@ async function pickAgent(roleId: string, agentId?: string): Promise<Agent> {
   )
 }
 
-export async function startResearch(input: { templateId: string; subject: string; context?: string; agentId?: string; projectId?: string; depth?: 'quick' | 'balanced' | 'deep' }): Promise<ResearchReport> {
+export async function startResearch(input: {
+  templateId: string
+  subject: string
+  context?: string
+  agentId?: string
+  projectId?: string
+  depth?: 'quick' | 'balanced' | 'deep'
+}): Promise<ResearchReport> {
   const template = templateById(input.templateId)
   const agent = await pickAgent(template.roleId, input.agentId)
   const t = Date.now()

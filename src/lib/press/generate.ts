@@ -17,7 +17,12 @@ async function agentFor(roleId: string, agentId?: string): Promise<Agent> {
     if (a) return a
   }
   const agents = await db.agents.toArray()
-  return agents.find((a) => a.roleId === roleId && a.status === 'active') ?? agents.find((a) => a.roleId === roleId) ?? agents.find((a) => a.roleId === 'copywriter') ?? (await getLeadAgent())!
+  return (
+    agents.find((a) => a.roleId === roleId && a.status === 'active') ??
+    agents.find((a) => a.roleId === roleId) ??
+    agents.find((a) => a.roleId === 'copywriter') ??
+    (await getLeadAgent())!
+  )
 }
 
 export async function startContent(input: { kind: ContentKind; brief: Record<string, string>; agentId?: string; projectId?: string; useWeb?: boolean }): Promise<ContentPiece> {
@@ -84,7 +89,12 @@ export async function writeContent(id: string, instruction?: string, useWeb = fa
       })
       writer.flush()
       await db.content.update(id, { content: res.text, status: 'ready', error: undefined, updatedAt: Date.now() })
-      if (!instruction) void logActivity('content', `${agent.name} wrote a ${tpl.name.toLowerCase()}`, { agentId: agent.id, minutesSaved: res.demo ? 0 : MINUTES_SAVED.content, link: `/press?doc=${id}` })
+      if (!instruction)
+        void logActivity('content', `${agent.name} wrote a ${tpl.name.toLowerCase()}`, {
+          agentId: agent.id,
+          minutesSaved: res.demo ? 0 : MINUTES_SAVED.content,
+          link: `/press?doc=${id}`,
+        })
     })
   } catch (err) {
     writer.flush()

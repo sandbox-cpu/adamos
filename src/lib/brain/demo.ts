@@ -13,10 +13,22 @@ interface Seed {
 }
 
 const clients: { name: string; sector: string; campaigns: string[]; contacts: string[]; people: string[] }[] = [
-  { name: 'Northwind Coffee', sector: 'food-drink', campaigns: ['Autumn Blend Launch', 'First Frost Mornings'], contacts: ['Priya Shah', 'Tom Hartley', 'Marcus Webb'], people: ['Jess Carter', 'Maya Brooks'] },
+  {
+    name: 'Northwind Coffee',
+    sector: 'food-drink',
+    campaigns: ['Autumn Blend Launch', 'First Frost Mornings'],
+    contacts: ['Priya Shah', 'Tom Hartley', 'Marcus Webb'],
+    people: ['Jess Carter', 'Maya Brooks'],
+  },
   { name: 'Lumen Skincare', sector: 'beauty', campaigns: ['Lumen Glow Pitch'], contacts: ['Aisha Bello', 'Sophie Laurent'], people: ['Sam Patel', 'Leo Martins'] },
   { name: 'Vertex Motors', sector: 'automotive', campaigns: ['Vertex EV Reveal'], contacts: ['Elena Rossi', 'Ryan Cole'], people: ['Olivia Grant'] },
-  { name: 'Harbour Lights Festival', sector: 'events', campaigns: ['Harbour Lights Winter Programme', 'Summer Street Party'], contacts: ['Marcus Webb', 'Sophie Laurent'], people: ['Maya Brooks', 'Noah Kim'] },
+  {
+    name: 'Harbour Lights Festival',
+    sector: 'events',
+    campaigns: ['Harbour Lights Winter Programme', 'Summer Street Party'],
+    contacts: ['Marcus Webb', 'Sophie Laurent'],
+    people: ['Maya Brooks', 'Noah Kim'],
+  },
   { name: 'Oakridge Bank', sector: 'finance', campaigns: ['Oakridge Money Confidence'], contacts: ['Daniel Okafor'], people: ['Olivia Grant', 'Sam Patel'] },
   { name: 'Bloom & Branch Florists', sector: 'retail', campaigns: ['Local Heroes Series'], contacts: ['Marcus Webb'], people: ['Noah Kim'] },
   { name: 'Tidal Fitness', sector: 'health', campaigns: ['Tidal New Year Reset'], contacts: ['Sophie Laurent', 'Aisha Bello'], people: ['Maya Brooks'] },
@@ -63,14 +75,46 @@ const ideas: { title: string; links: string[]; tags: string[] }[] = [
 ]
 
 const playbooks: { title: string; points: string[]; links: string[] }[] = [
-  { title: 'Crisis Playbook', points: ['First hour: facts, owner, holding statement', 'Stakeholder map and message matrix', 'Legal review before anything goes out', 'Update cadence every two hours'], links: ['Vertex Motors', 'Olivia Grant', 'Newsjacking checklist'] },
-  { title: 'Launch Playbook', points: ['Exclusive first, then wide release', 'Real-world moment for pictures', 'Creators in week two', 'Results report in week six'], links: ['Autumn Blend Launch', 'Vertex EV Reveal', 'Event Playbook'] },
-  { title: 'Pitch Playbook', points: ['Decode the brief in the first 24 hours', 'One big idea, three proof points', 'Rehearse twice with a sceptic', 'Leave-behind deck within 24 hours'], links: ['Lumen Glow Pitch', 'New Business Pipeline', 'Case Studies'] },
-  { title: 'Media Relations Playbook', points: ['Personalise every pitch', 'Offer assets and spokespeople', 'Follow up once, then move on', 'Log every conversation'], links: ['Priya Shah', 'Tom Hartley', 'Newsjacking checklist'] },
-  { title: 'Measurement Framework', points: ['Outputs, outtakes, outcomes, impact', 'No advertising value equivalents', 'Agree KPIs at kickoff', 'Monthly one-page dashboard'], links: ['Oakridge Money Confidence', 'Data story - breakfast habits'] },
-  { title: 'Influencer Playbook', points: ['Audience fit over follower count', 'Clear brief and disclosure rules', 'Usage rights agreed up front'], links: ['Creator rituals', 'Micro-influencer network', 'Maya Brooks'] },
-  { title: 'Event Playbook', points: ['Run of show with minute timings', 'Press check-in and asset pack', 'Weather and capacity plan B'], links: ['Sunrise pop-ups', 'Harbour Lights Winter Programme'] },
-  { title: 'Onboarding a new client', points: ['Kickoff agenda and brand immersion', 'Access to assets and approvals', 'Agree reporting rhythm'], links: ['Services', 'Jess Carter', 'Measurement Framework'] },
+  {
+    title: 'Crisis Playbook',
+    points: ['First hour: facts, owner, holding statement', 'Stakeholder map and message matrix', 'Legal review before anything goes out', 'Update cadence every two hours'],
+    links: ['Vertex Motors', 'Olivia Grant', 'Newsjacking checklist'],
+  },
+  {
+    title: 'Launch Playbook',
+    points: ['Exclusive first, then wide release', 'Real-world moment for pictures', 'Creators in week two', 'Results report in week six'],
+    links: ['Autumn Blend Launch', 'Vertex EV Reveal', 'Event Playbook'],
+  },
+  {
+    title: 'Pitch Playbook',
+    points: ['Decode the brief in the first 24 hours', 'One big idea, three proof points', 'Rehearse twice with a sceptic', 'Leave-behind deck within 24 hours'],
+    links: ['Lumen Glow Pitch', 'New Business Pipeline', 'Case Studies'],
+  },
+  {
+    title: 'Media Relations Playbook',
+    points: ['Personalise every pitch', 'Offer assets and spokespeople', 'Follow up once, then move on', 'Log every conversation'],
+    links: ['Priya Shah', 'Tom Hartley', 'Newsjacking checklist'],
+  },
+  {
+    title: 'Measurement Framework',
+    points: ['Outputs, outtakes, outcomes, impact', 'No advertising value equivalents', 'Agree KPIs at kickoff', 'Monthly one-page dashboard'],
+    links: ['Oakridge Money Confidence', 'Data story - breakfast habits'],
+  },
+  {
+    title: 'Influencer Playbook',
+    points: ['Audience fit over follower count', 'Clear brief and disclosure rules', 'Usage rights agreed up front'],
+    links: ['Creator rituals', 'Micro-influencer network', 'Maya Brooks'],
+  },
+  {
+    title: 'Event Playbook',
+    points: ['Run of show with minute timings', 'Press check-in and asset pack', 'Weather and capacity plan B'],
+    links: ['Sunrise pop-ups', 'Harbour Lights Winter Programme'],
+  },
+  {
+    title: 'Onboarding a new client',
+    points: ['Kickoff agenda and brand immersion', 'Access to assets and approvals', 'Agree reporting rhythm'],
+    links: ['Services', 'Jess Carter', 'Measurement Framework'],
+  },
 ]
 
 const research: { title: string; links: string[]; tags: string[] }[] = [
@@ -85,8 +129,16 @@ const research: { title: string; links: string[]; tags: string[] }[] = [
 ]
 
 const agency: { title: string; body: string; links: string[] }[] = [
-  { title: 'Positioning', body: 'We are the agency that makes brands talked about for the right reasons: bold ideas, earned attention and results we can prove.', links: ['Services', 'Tone of Voice', 'Case Studies'] },
-  { title: 'Services', body: 'Consumer PR, corporate reputation, crisis readiness, creator partnerships, events and digital PR.', links: ['Positioning', 'Pricing', 'AI in PR workshop'] },
+  {
+    title: 'Positioning',
+    body: 'We are the agency that makes brands talked about for the right reasons: bold ideas, earned attention and results we can prove.',
+    links: ['Services', 'Tone of Voice', 'Case Studies'],
+  },
+  {
+    title: 'Services',
+    body: 'Consumer PR, corporate reputation, crisis readiness, creator partnerships, events and digital PR.',
+    links: ['Positioning', 'Pricing', 'AI in PR workshop'],
+  },
   { title: 'Team', body: 'A small senior team with specialist freelancers when needed.', links: team.map((t) => t.name) },
   { title: 'Pricing', body: 'Retainers from four days a month; project fees for launches and events; crisis support on call-off.', links: ['Services', 'New Business Pipeline'] },
   { title: 'Values', body: 'Brave ideas, honest advice, no surprises.', links: ['Positioning', 'Weekly rituals'] },
@@ -126,7 +178,10 @@ function buildSeeds(): Seed[] {
     })
   }
   for (const camp of extraCampaigns) {
-    seeds.push({ path: `Campaigns/${camp}.md`, body: `# ${camp}\n\nPulling our best work into an awards entry. See ${link('Case Studies')} and ${link('Awards strategy')}.\n\n#campaign #awards\n` })
+    seeds.push({
+      path: `Campaigns/${camp}.md`,
+      body: `# ${camp}\n\nPulling our best work into an awards entry. See ${link('Case Studies')} and ${link('Awards strategy')}.\n\n#campaign #awards\n`,
+    })
   }
 
   for (const j of journalists) {

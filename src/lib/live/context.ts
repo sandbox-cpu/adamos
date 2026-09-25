@@ -21,8 +21,10 @@ export async function liveInstructions(agent: Agent): Promise<string> {
   const projects = (await db.projects.toArray()).filter((p) => p.status === 'active' || p.status === 'pitch')
 
   const snapshot = [
-    `Right now it is ${format(new Date(), "EEEE d MMMM yyyy, HH:mm")}.`,
-    events.length ? `Upcoming calendar:\n${events.map((e) => `- ${format(new Date(e.start), 'EEE HH:mm')} ${e.title}`).join('\n')}` : 'The calendar is clear for the next two days.',
+    `Right now it is ${format(new Date(), 'EEEE d MMMM yyyy, HH:mm')}.`,
+    events.length
+      ? `Upcoming calendar:\n${events.map((e) => `- ${format(new Date(e.start), 'EEE HH:mm')} ${e.title}`).join('\n')}`
+      : 'The calendar is clear for the next two days.',
     tasks.length ? `Tasks due soon:\n${tasks.map((t) => `- ${t.title} (due ${t.dueDate})`).join('\n')}` : '',
     projects.length ? `Current projects: ${projects.map((p) => `${p.name}${p.client ? ` (${p.client})` : ''}`).join('; ')}.` : '',
   ]

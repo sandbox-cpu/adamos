@@ -203,7 +203,10 @@ export async function runAnthropic(ctx: AdapterContext, req: LLMRequest): Promis
           useWeb = false
           webSearchUnavailable.add(apiKey)
           text = textAtStart
-          req.onEvent?.({ type: 'notice', message: 'Live web search isn’t enabled for this Claude account, so this answer uses Claude’s own knowledge. An admin can switch web search on in the Claude Console.' })
+          req.onEvent?.({
+            type: 'notice',
+            message: 'Live web search isn’t enabled for this Claude account, so this answer uses Claude’s own knowledge. An admin can switch web search on in the Claude Console.',
+          })
           continue
         }
       }

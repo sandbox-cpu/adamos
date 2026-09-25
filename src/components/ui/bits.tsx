@@ -7,7 +7,19 @@ import { cn } from '../../lib/utils'
 /*  Tabs (segmented control)                                           */
 /* ------------------------------------------------------------------ */
 
-export function Tabs<T extends string>({ value, onChange, items, className, size = 'md' }: { value: T; onChange: (v: T) => void; items: { id: T; label: ReactNode; icon?: ReactNode; count?: number }[]; className?: string; size?: 'sm' | 'md' }) {
+export function Tabs<T extends string>({
+  value,
+  onChange,
+  items,
+  className,
+  size = 'md',
+}: {
+  value: T
+  onChange: (v: T) => void
+  items: { id: T; label: ReactNode; icon?: ReactNode; count?: number }[]
+  className?: string
+  size?: 'sm' | 'md'
+}) {
   return (
     <div className={cn('inline-flex max-w-full items-center gap-1 overflow-x-auto rounded-2xl border border-white/[0.07] bg-white/[0.03] p-1 no-scrollbar', className)}>
       {items.map((it) => {
@@ -22,7 +34,13 @@ export function Tabs<T extends string>({ value, onChange, items, className, size
               active ? 'text-fg' : 'text-muted hover:text-soft',
             )}
           >
-            {active && <motion.span layoutId={`tab-${items.map((i) => i.id).join('')}`} className="absolute inset-0 rounded-xl bg-white/[0.09] shadow-[inset_0_1px_0_rgb(255_255_255/0.08)]" transition={{ type: 'spring', stiffness: 500, damping: 38 }} />}
+            {active && (
+              <motion.span
+                layoutId={`tab-${items.map((i) => i.id).join('')}`}
+                className="absolute inset-0 rounded-xl bg-white/[0.09] shadow-[inset_0_1px_0_rgb(255_255_255/0.08)]"
+                transition={{ type: 'spring', stiffness: 500, damping: 38 }}
+              />
+            )}
             <span className="relative flex items-center gap-2">
               {it.icon}
               {it.label}
@@ -86,7 +104,18 @@ export function ProgressRing({ value, size = 44, stroke = 4, color, label }: { v
     <div className="relative grid shrink-0 place-items-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
         <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgb(255 255 255 / 0.08)" strokeWidth={stroke} />
-        <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color ?? 'var(--accent)'} strokeWidth={stroke} strokeLinecap="round" strokeDasharray={c} strokeDashoffset={c * (1 - v)} style={{ transition: 'stroke-dashoffset .8s cubic-bezier(.2,.8,.2,1)' }} />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={r}
+          fill="none"
+          stroke={color ?? 'var(--accent)'}
+          strokeWidth={stroke}
+          strokeLinecap="round"
+          strokeDasharray={c}
+          strokeDashoffset={c * (1 - v)}
+          style={{ transition: 'stroke-dashoffset .8s cubic-bezier(.2,.8,.2,1)' }}
+        />
       </svg>
       <span className="absolute text-[11px] font-semibold text-fg">{label ?? `${Math.round(v * 100)}%`}</span>
     </div>
@@ -96,7 +125,10 @@ export function ProgressRing({ value, size = 44, stroke = 4, color, label }: { v
 export function ProgressBar({ value, color, className }: { value: number; color?: string; className?: string }) {
   return (
     <div className={cn('h-1.5 w-full overflow-hidden rounded-full bg-white/[0.07]', className)}>
-      <div className="h-full rounded-full transition-[width] duration-700" style={{ width: `${Math.max(0, Math.min(1, value)) * 100}%`, background: color ?? 'linear-gradient(90deg,var(--accent),var(--accent-2))' }} />
+      <div
+        className="h-full rounded-full transition-[width] duration-700"
+        style={{ width: `${Math.max(0, Math.min(1, value)) * 100}%`, background: color ?? 'linear-gradient(90deg,var(--accent),var(--accent-2))' }}
+      />
     </div>
   )
 }
@@ -106,7 +138,11 @@ export function ProgressBar({ value, color, className }: { value: number; color?
 /* ------------------------------------------------------------------ */
 
 export function Kbd({ children }: { children: ReactNode }) {
-  return <kbd className="inline-flex h-5 min-w-5 items-center justify-center rounded-md border border-white/10 bg-white/[0.06] px-1.5 font-sans text-[10px] font-medium text-muted">{children}</kbd>
+  return (
+    <kbd className="inline-flex h-5 min-w-5 items-center justify-center rounded-md border border-white/10 bg-white/[0.06] px-1.5 font-sans text-[10px] font-medium text-muted">
+      {children}
+    </kbd>
+  )
 }
 
 /* ------------------------------------------------------------------ */

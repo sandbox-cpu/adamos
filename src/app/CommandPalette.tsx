@@ -2,7 +2,22 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
-import { ArrowRight, BrainCircuit, CornerDownLeft, FileText, FlaskConical, FolderKanban, FolderPlus, ImagePlus, MessageSquare, PanelsTopLeft, Presentation, Radio, Search, Sparkles } from 'lucide-react'
+import {
+  ArrowRight,
+  BrainCircuit,
+  CornerDownLeft,
+  FileText,
+  FlaskConical,
+  FolderKanban,
+  FolderPlus,
+  ImagePlus,
+  MessageSquare,
+  PanelsTopLeft,
+  Presentation,
+  Radio,
+  Search,
+  Sparkles,
+} from 'lucide-react'
 import { ALL_NAV } from './nav'
 import { useUI } from '../stores/ui'
 import { useAgents, useLead, useProjects, useRoles } from '../hooks/data'
@@ -96,10 +111,25 @@ export function CommandPalette() {
       { id: 'a-site', group: 'Create', label: 'New landing page', icon: <PanelsTopLeft />, keywords: 'landing page website microsite', run: () => go('/sites?new=1') },
       { id: 'a-research', group: 'Create', label: 'New research', icon: <FlaskConical />, keywords: 'research competitor market trends', run: () => go('/research?new=1') },
       { id: 'a-image', group: 'Create', label: 'Create an image', icon: <ImagePlus />, keywords: 'image picture generate media', run: () => go('/media') },
-      { id: 'a-press', group: 'Create', label: 'Write a press release', icon: <FileText />, keywords: 'press release pitch statement write', run: () => go('/press?new=press_release') },
+      {
+        id: 'a-press',
+        group: 'Create',
+        label: 'Write a press release',
+        icon: <FileText />,
+        keywords: 'press release pitch statement write',
+        run: () => go('/press?new=press_release'),
+      },
       { id: 'a-live', group: 'Create', label: 'Go live with voice & screen share', icon: <Radio />, keywords: 'live voice call screen share talk', run: () => go('/live') },
     ]
-    const nav: Item[] = ALL_NAV.map((n) => ({ id: `nav-${n.to}`, group: 'Go to', label: n.label, hint: n.description, icon: <n.icon />, keywords: `${n.label} ${n.description}`.toLowerCase(), run: () => go(n.to) }))
+    const nav: Item[] = ALL_NAV.map((n) => ({
+      id: `nav-${n.to}`,
+      group: 'Go to',
+      label: n.label,
+      hint: n.description,
+      icon: <n.icon />,
+      keywords: `${n.label} ${n.description}`.toLowerCase(),
+      run: () => go(n.to),
+    }))
     const agentItems: Item[] = agents.map((a) => ({
       id: `agent-${a.id}`,
       group: 'Chat with',
@@ -190,7 +220,10 @@ export function CommandPalette() {
                       data-index={i}
                       onMouseMove={() => setActive(i)}
                       onClick={() => item.run()}
-                      className={cn('flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-sm transition [&_svg]:size-[18px]', i === active ? 'bg-white/[0.08] text-fg' : 'text-soft')}
+                      className={cn(
+                        'flex w-full items-center gap-3 rounded-2xl px-3 py-2.5 text-left text-sm transition [&_svg]:size-[18px]',
+                        i === active ? 'bg-white/[0.08] text-fg' : 'text-soft',
+                      )}
                     >
                       <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-white/[0.05] text-muted">{item.icon}</span>
                       <span className="min-w-0 flex-1 truncate">{item.label}</span>

@@ -15,7 +15,10 @@ interface Props {
 
 function preprocess(md: string): string {
   return md
-    .replace(/!?\[\[([^\]|#^]+)(?:[#^][^\]|]*)?(?:\|([^\]]+))?\]\]/g, (_m, target: string, alias?: string) => `[${(alias ?? target).trim()}](wikilink:${encodeURIComponent(target.trim())})`)
+    .replace(
+      /!?\[\[([^\]|#^]+)(?:[#^][^\]|]*)?(?:\|([^\]]+))?\]\]/g,
+      (_m, target: string, alias?: string) => `[${(alias ?? target).trim()}](wikilink:${encodeURIComponent(target.trim())})`,
+    )
     .replace(/(^|[\s(])#([\p{L}_\-/][\p{L}\p{N}_\-/]*)/gu, (_m, pre: string, tag: string) => `${pre}[#${tag}](tag:${encodeURIComponent(tag)})`)
 }
 

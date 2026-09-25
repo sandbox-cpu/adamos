@@ -35,7 +35,7 @@ interface GeminiChunk {
 /** Gemini accepts an OpenAPI-style subset of JSON Schema. */
 export function toGeminiSchema(schema: JSONSchema): Record<string, unknown> {
   const out: Record<string, unknown> = {}
-  if (schema.type) out.type = Array.isArray(schema.type) ? schema.type.find((t) => t !== 'null') ?? 'string' : schema.type
+  if (schema.type) out.type = Array.isArray(schema.type) ? (schema.type.find((t) => t !== 'null') ?? 'string') : schema.type
   if (schema.description) out.description = schema.description
   if (schema.enum) out.enum = schema.enum.map(String)
   if (schema.properties) {

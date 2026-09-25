@@ -4,18 +4,7 @@ export type ID = string
 /*  AI providers & profiles                                            */
 /* ------------------------------------------------------------------ */
 
-export type ProviderId =
-  | 'anthropic'
-  | 'openai'
-  | 'gemini'
-  | 'openrouter'
-  | 'groq'
-  | 'mistral'
-  | 'perplexity'
-  | 'deepseek'
-  | 'xai'
-  | 'ollama'
-  | 'custom'
+export type ProviderId = 'anthropic' | 'openai' | 'gemini' | 'openrouter' | 'groq' | 'mistral' | 'perplexity' | 'deepseek' | 'xai' | 'ollama' | 'custom'
 
 /** How hard the model should think. Mapped to provider specific settings. */
 export type Depth = 'quick' | 'balanced' | 'deep'
@@ -292,20 +281,7 @@ export interface ResearchReport {
 /*  Decks                                                              */
 /* ------------------------------------------------------------------ */
 
-export type SlideLayout =
-  | 'title'
-  | 'section'
-  | 'bullets'
-  | 'two-column'
-  | 'big-stat'
-  | 'stats'
-  | 'quote'
-  | 'image'
-  | 'timeline'
-  | 'comparison'
-  | 'chart'
-  | 'agenda'
-  | 'closing'
+export type SlideLayout = 'title' | 'section' | 'bullets' | 'two-column' | 'big-stat' | 'stats' | 'quote' | 'image' | 'timeline' | 'comparison' | 'chart' | 'agenda' | 'closing'
 
 export interface SlideChart {
   kind: 'bar' | 'line' | 'donut'
@@ -371,18 +347,7 @@ export interface Deck {
 /*  Landing pages                                                      */
 /* ------------------------------------------------------------------ */
 
-export type SiteSectionType =
-  | 'hero'
-  | 'logos'
-  | 'features'
-  | 'stats'
-  | 'split'
-  | 'testimonials'
-  | 'timeline'
-  | 'faq'
-  | 'cta'
-  | 'contact'
-  | 'footer'
+export type SiteSectionType = 'hero' | 'logos' | 'features' | 'stats' | 'split' | 'testimonials' | 'timeline' | 'faq' | 'cta' | 'contact' | 'footer'
 
 export interface SiteItem {
   title?: string
@@ -455,19 +420,7 @@ export interface Site {
 /*  Press office                                                       */
 /* ------------------------------------------------------------------ */
 
-export type ContentKind =
-  | 'press_release'
-  | 'pitch'
-  | 'statement'
-  | 'social'
-  | 'linkedin'
-  | 'bio'
-  | 'award'
-  | 'newsletter'
-  | 'talking_points'
-  | 'qa'
-  | 'email'
-  | 'blog'
+export type ContentKind = 'press_release' | 'pitch' | 'statement' | 'social' | 'linkedin' | 'bio' | 'award' | 'newsletter' | 'talking_points' | 'qa' | 'email' | 'blog'
 
 export interface ContentPiece {
   id: ID
@@ -622,19 +575,7 @@ export interface MediaItem {
 /*  Activity log                                                       */
 /* ------------------------------------------------------------------ */
 
-export type LogKind =
-  | 'chat'
-  | 'task'
-  | 'research'
-  | 'deck'
-  | 'site'
-  | 'plan'
-  | 'content'
-  | 'brief'
-  | 'meeting'
-  | 'delegation'
-  | 'note'
-  | 'system'
+export type LogKind = 'chat' | 'task' | 'research' | 'deck' | 'site' | 'plan' | 'content' | 'brief' | 'meeting' | 'delegation' | 'note' | 'system'
 
 export interface LogEntry {
   id: ID

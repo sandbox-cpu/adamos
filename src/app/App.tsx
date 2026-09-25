@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { HashRouter, Navigate, Route, Routes } from 'react-router-dom'
-import { AnimatePresence } from 'motion/react'
+import { AnimatePresence, MotionConfig } from 'motion/react'
 import { Shell, PageLoader } from './Shell'
 import { useSettings } from '../stores/settings'
 import { useVault } from '../stores/vault'
@@ -59,6 +59,7 @@ export default function App() {
   const ready = useBoot()
   const showIntro = useUI((s) => s.showIntro)
   const onboarded = useSettings((s) => s.settings.onboarded)
+  const reduceMotion = useSettings((s) => s.settings.reduceMotion)
 
   if (!ready) {
     return (
@@ -69,56 +70,58 @@ export default function App() {
   }
 
   return (
-    <HashRouter>
-      <Routes>
-        <Route
-          path="/present/:id"
-          element={
-            <Suspense fallback={<PageLoader />}>
-              <PresentPage />
+    <MotionConfig reducedMotion={reduceMotion ? 'always' : 'user'}>
+      <HashRouter>
+        <Routes>
+          <Route
+            path="/present/:id"
+            element={
+              <Suspense fallback={<PageLoader />}>
+                <PresentPage />
+              </Suspense>
+            }
+          />
+          <Route element={<Shell />}>
+            <Route index element={<Dashboard />} />
+            <Route path="projects" element={<ProjectsPage />} />
+            <Route path="projects/:id" element={<ProjectDetail />} />
+            <Route path="calendar" element={<CalendarPage />} />
+            <Route path="agents" element={<AgentsPage />} />
+            <Route path="agents/:id" element={<AgentsPage />} />
+            <Route path="comms" element={<CommsPage />} />
+            <Route path="comms/:id" element={<CommsPage />} />
+            <Route path="huddle" element={<HuddlePage />} />
+            <Route path="huddle/:id" element={<HuddlePage />} />
+            <Route path="mastermind" element={<MastermindPage />} />
+            <Route path="mastermind/:id" element={<MastermindPage />} />
+            <Route path="research" element={<ResearchPage />} />
+            <Route path="research/:id" element={<ResearchPage />} />
+            <Route path="decks" element={<DecksPage />} />
+            <Route path="decks/:id" element={<DeckEditor />} />
+            <Route path="sites" element={<SitesPage />} />
+            <Route path="sites/:id" element={<SiteEditor />} />
+            <Route path="media" element={<MediaPage />} />
+            <Route path="press" element={<PressPage />} />
+            <Route path="brain" element={<BrainPage />} />
+            <Route path="live" element={<LivePage />} />
+            <Route path="vault" element={<VaultPage />} />
+            <Route path="settings" element={<SettingsPage />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+          </Route>
+        </Routes>
+        <AnimatePresence>
+          {showIntro && (
+            <Suspense fallback={null}>
+              <Intro key="intro" />
             </Suspense>
-          }
-        />
-        <Route element={<Shell />}>
-          <Route index element={<Dashboard />} />
-          <Route path="projects" element={<ProjectsPage />} />
-          <Route path="projects/:id" element={<ProjectDetail />} />
-          <Route path="calendar" element={<CalendarPage />} />
-          <Route path="agents" element={<AgentsPage />} />
-          <Route path="agents/:id" element={<AgentsPage />} />
-          <Route path="comms" element={<CommsPage />} />
-          <Route path="comms/:id" element={<CommsPage />} />
-          <Route path="huddle" element={<HuddlePage />} />
-          <Route path="huddle/:id" element={<HuddlePage />} />
-          <Route path="mastermind" element={<MastermindPage />} />
-          <Route path="mastermind/:id" element={<MastermindPage />} />
-          <Route path="research" element={<ResearchPage />} />
-          <Route path="research/:id" element={<ResearchPage />} />
-          <Route path="decks" element={<DecksPage />} />
-          <Route path="decks/:id" element={<DeckEditor />} />
-          <Route path="sites" element={<SitesPage />} />
-          <Route path="sites/:id" element={<SiteEditor />} />
-          <Route path="media" element={<MediaPage />} />
-          <Route path="press" element={<PressPage />} />
-          <Route path="brain" element={<BrainPage />} />
-          <Route path="live" element={<LivePage />} />
-          <Route path="vault" element={<VaultPage />} />
-          <Route path="settings" element={<SettingsPage />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Route>
-      </Routes>
-      <AnimatePresence>
-        {showIntro && (
+          )}
+        </AnimatePresence>
+        {!showIntro && !onboarded && (
           <Suspense fallback={null}>
-            <Intro key="intro" />
+            <Onboarding />
           </Suspense>
         )}
-      </AnimatePresence>
-      {!showIntro && !onboarded && (
-        <Suspense fallback={null}>
-          <Onboarding />
-        </Suspense>
-      )}
-    </HashRouter>
+      </HashRouter>
+    </MotionConfig>
   )
 }

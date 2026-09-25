@@ -194,7 +194,9 @@ export default function Intro() {
     >
       <div className="absolute inset-0">
         <CanvasBoundary
-          fallback={<div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,color-mix(in_oklab,var(--accent)_45%,transparent),transparent_40%),radial-gradient(circle_at_60%_60%,color-mix(in_oklab,var(--accent-2)_30%,transparent),transparent_45%)]" />}
+          fallback={
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_45%,color-mix(in_oklab,var(--accent)_45%,transparent),transparent_40%),radial-gradient(circle_at_60%_60%,color-mix(in_oklab,var(--accent-2)_30%,transparent),transparent_45%)]" />
+          }
         >
           <HeroCanvas signals={signals} agentColors={agentColors} />
         </CanvasBoundary>
@@ -227,7 +229,12 @@ export default function Intro() {
             <p className="mt-7 h-8 font-serif text-[clamp(20px,2.6vw,30px)] text-soft italic [text-shadow:0_2px_18px_rgb(0_0_0/0.9)]">
               <span className="caret">{typed}</span>
             </p>
-            <motion.div className="mt-9 flex flex-wrap justify-center gap-2.5" initial="hidden" animate="show" variants={{ show: { transition: { staggerChildren: 0.09, delayChildren: 2.9 } } }}>
+            <motion.div
+              className="mt-9 flex flex-wrap justify-center gap-2.5"
+              initial="hidden"
+              animate="show"
+              variants={{ show: { transition: { staggerChildren: 0.09, delayChildren: 2.9 } } }}
+            >
               {[
                 { icon: <CalendarDays className="size-4" />, text: stats ? `${stats.meetings} meetings today` : '…' },
                 { icon: <CircleCheck className="size-4" />, text: stats ? `${stats.due} tasks due` : '…' },
@@ -267,7 +274,8 @@ export default function Intro() {
                   Everything you know. <span className="text-gradient">Connected.</span>
                 </h2>
                 <p className="mx-auto mt-6 max-w-xl text-lg text-soft">
-                  {stats ? `${stats.notes.toLocaleString()} notes and ${stats.links.toLocaleString()} connections` : 'Your notes'} from your Obsidian vault, ready for every agent to draw on.
+                  {stats ? `${stats.notes.toLocaleString()} notes and ${stats.links.toLocaleString()} connections` : 'Your notes'} from your Obsidian vault, ready for every agent
+                  to draw on.
                 </p>
               </Section>
 

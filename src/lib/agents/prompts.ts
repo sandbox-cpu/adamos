@@ -12,7 +12,12 @@ export interface TeamMember {
 export function describePersonality(p: Personality): string {
   const formality = p.formality < 35 ? 'relaxed and conversational' : p.formality > 65 ? 'polished and formal' : 'professional but friendly'
   const detail = p.detail < 35 ? 'brief: get to the point fast' : p.detail > 65 ? 'thorough, with supporting detail and examples' : 'balanced in detail'
-  const boldness = p.boldness < 35 ? 'cautious: flag risks and prefer proven approaches' : p.boldness > 65 ? 'bold: push for ambitious, distinctive ideas' : 'balanced between ambition and caution'
+  const boldness =
+    p.boldness < 35
+      ? 'cautious: flag risks and prefer proven approaches'
+      : p.boldness > 65
+        ? 'bold: push for ambitious, distinctive ideas'
+        : 'balanced between ambition and caution'
   return `Your tone is ${formality}. You are ${detail}. You are ${boldness}.`
 }
 
@@ -57,9 +62,7 @@ export function buildSystemPrompt({ agent, role, settings, team, mode, canDelega
   if (teammates) {
     parts.push(
       `## Your teammates\n${teammates}\n${
-        canDelegate
-          ? 'You can hand work to them with the delegate_to_agent tool.'
-          : 'If a question is really another teammate’s speciality, say who is best placed to help.'
+        canDelegate ? 'You can hand work to them with the delegate_to_agent tool.' : 'If a question is really another teammate’s speciality, say who is best placed to help.'
       }`,
     )
   }

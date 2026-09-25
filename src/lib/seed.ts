@@ -2,18 +2,7 @@ import { addDays, format, set, startOfWeek } from 'date-fns'
 import { db } from './db'
 import { defaultAgents } from './agents/defaults'
 import { demoNotes } from './brain/demo'
-import type {
-  LogEntry,
-  CalEvent,
-  ContentPiece,
-  CoverageItem,
-  Deck,
-  MediaContact,
-  Project,
-  ResearchReport,
-  Site,
-  Task,
-} from './types'
+import type { LogEntry, CalEvent, ContentPiece, CoverageItem, Deck, MediaContact, Project, ResearchReport, Site, Task } from './types'
 import { dateFromNow, uid } from './utils'
 import { SITE_PRESETS } from './sites/themes'
 
@@ -22,14 +11,18 @@ const DEMO_WEEK_KEY = 'demo.eventsWeek'
 
 /** Safe to call concurrently: the check and the writes share one transaction. */
 export async function ensureSeeded(): Promise<boolean> {
-  const seededNow = await db.transaction('rw', [db.agents, db.projects, db.tasks, db.contacts, db.coverage, db.content, db.research, db.decks, db.sites, db.notes, db.log, db.kv], async () => {
-    if (await db.kv.get(SEEDED_KEY)) return false
-    await db.agents.bulkPut(defaultAgents())
-    await seedWorkspace()
-    await db.notes.bulkPut(demoNotes())
-    await db.kv.put({ key: SEEDED_KEY, value: true })
-    return true
-  })
+  const seededNow = await db.transaction(
+    'rw',
+    [db.agents, db.projects, db.tasks, db.contacts, db.coverage, db.content, db.research, db.decks, db.sites, db.notes, db.log, db.kv],
+    async () => {
+      if (await db.kv.get(SEEDED_KEY)) return false
+      await db.agents.bulkPut(defaultAgents())
+      await seedWorkspace()
+      await db.notes.bulkPut(demoNotes())
+      await db.kv.put({ key: SEEDED_KEY, value: true })
+      return true
+    },
+  )
   if (seededNow) await refreshDemoEvents(true)
   return seededNow
 }
@@ -45,8 +38,7 @@ async function seedWorkspace() {
       priority: 'high',
       color: '#f59e0b',
       emoji: '☕',
-      description:
-        'National launch of Northwind’s limited-edition Autumn Blend. Earned media first, supported by a sampling event, creator partnerships and social.',
+      description: 'National launch of Northwind’s limited-edition Autumn Blend. Earned media first, supported by a sampling event, creator partnerships and social.',
       goals: ['40+ pieces of national and trade coverage', 'Sell out the launch batch in six weeks', 'Grow Instagram following by 15%'],
       startDate: dateFromNow(-12),
       dueDate: dateFromNow(18),
@@ -135,7 +127,15 @@ async function seedWorkspace() {
   ]
   await db.projects.bulkPut(projects)
 
-  const task = (projectId: string, title: string, status: Task['status'], due: number | undefined, assigneeId: string, priority: Task['priority'] = 'medium', description?: string): Task => ({
+  const task = (
+    projectId: string,
+    title: string,
+    status: Task['status'],
+    due: number | undefined,
+    assigneeId: string,
+    priority: Task['priority'] = 'medium',
+    description?: string,
+  ): Task => ({
     id: uid(),
     projectId,
     title,
@@ -265,7 +265,13 @@ async function seedWorkspace() {
     updatedAt: t,
     demo: true,
     slides: [
-      { id: uid(), layout: 'title', title: 'Autumn Blend Launch', subtitle: 'Campaign plan · Northwind Coffee', notes: 'Welcome everyone and set up the ambition for the next six weeks.' },
+      {
+        id: uid(),
+        layout: 'title',
+        title: 'Autumn Blend Launch',
+        subtitle: 'Campaign plan · Northwind Coffee',
+        notes: 'Welcome everyone and set up the ambition for the next six weeks.',
+      },
       {
         id: uid(),
         layout: 'agenda',
@@ -321,7 +327,12 @@ async function seedWorkspace() {
         title: 'Where the budget goes',
         chart: { kind: 'donut', labels: ['Media relations', 'Pop-up event', 'Creators', 'Social', 'Measurement'], series: [{ name: 'Budget %', values: [35, 25, 20, 15, 5] }] },
       },
-      { id: uid(), layout: 'quote', title: 'Campaign line', quote: { text: 'Autumn doesn’t start on the calendar. It starts with the first cup.', author: 'Campaign line', role: 'First Frost Mornings' } },
+      {
+        id: uid(),
+        layout: 'quote',
+        title: 'Campaign line',
+        quote: { text: 'Autumn doesn’t start on the calendar. It starts with the first cup.', author: 'Campaign line', role: 'First Frost Mornings' },
+      },
       { id: uid(), layout: 'closing', title: 'Let’s brew something brilliant', subtitle: 'Next step: sign-off by Friday so we can brief press next week.' },
     ],
   }
@@ -414,9 +425,7 @@ async function seedWorkspace() {
     [11.2, 'content', 'Echo drafted a holding statement for Vertex', 'echo', 35],
     [12.6, 'plan', 'Mastermind planned the festival partnerships', 'atlas', 90],
   ]
-  await db.log.bulkPut(
-    log.map(([ago, kind, text, agentId, minutesSaved]) => ({ id: uid(), at: t - ago * day, kind, text, agentId, minutesSaved, demo: true })),
-  )
+  await db.log.bulkPut(log.map(([ago, kind, text, agentId, minutesSaved]) => ({ id: uid(), at: t - ago * day, kind, text, agentId, minutesSaved, demo: true })))
 }
 
 /** Keeps demo meetings on the current week so the calendar always looks alive. */
@@ -427,38 +436,47 @@ export async function refreshDemoEvents(force = false): Promise<void> {
     const settingsRow = (await db.kv.get('settings'))?.value as { demoData?: boolean } | undefined
     if (settingsRow && settingsRow.demoData === false) return
     if (!force && stored === weekStart) return
-    await db.events.where('source').equals('local').filter((e) => !!e.demo).delete()
-  const today = new Date()
-  const at = (dayOffset: number, h: number, m: number) => set(addDays(today, dayOffset), { hours: h, minutes: m, seconds: 0, milliseconds: 0 })
-  const ev = (dayOffset: number, h: number, m: number, mins: number, title: string, extra: Partial<CalEvent> = {}): CalEvent => {
-    const start = at(dayOffset, h, m)
-    return {
-      id: uid(),
-      title,
-      start: start.toISOString(),
-      end: new Date(start.getTime() + mins * 60_000).toISOString(),
-      source: 'local',
-      demo: true,
-      ...extra,
+    await db.events
+      .where('source')
+      .equals('local')
+      .filter((e) => !!e.demo)
+      .delete()
+    const today = new Date()
+    const at = (dayOffset: number, h: number, m: number) => set(addDays(today, dayOffset), { hours: h, minutes: m, seconds: 0, milliseconds: 0 })
+    const ev = (dayOffset: number, h: number, m: number, mins: number, title: string, extra: Partial<CalEvent> = {}): CalEvent => {
+      const start = at(dayOffset, h, m)
+      return {
+        id: uid(),
+        title,
+        start: start.toISOString(),
+        end: new Date(start.getTime() + mins * 60_000).toISOString(),
+        source: 'local',
+        demo: true,
+        ...extra,
+      }
     }
-  }
-  const events: CalEvent[] = [
-    ev(0, 9, 0, 30, 'Team stand-up', { location: 'Studio', color: '#8b6cff' }),
-    ev(0, 10, 30, 60, 'Northwind: press release sign-off', { projectId: 'p-northwind', color: '#f59e0b', location: 'Video call', description: 'Walk the client through the final release and embargo plan.' }),
-    ev(0, 13, 0, 60, 'Lunch with Priya Shah (The Daily Ledger)', { location: 'The Corner Café', color: '#34d399' }),
-    ev(0, 15, 0, 90, 'Lumen pitch: creative workshop', { projectId: 'p-lumen', color: '#f472b6', description: 'Pick the lead creative territory for the pitch.' }),
-    ev(0, 17, 30, 30, 'Call: Vertex comms director', { projectId: 'p-vertex', color: '#f87171' }),
-    ev(1, 9, 30, 60, 'Harbour Lights partnership call', { projectId: 'p-harbour', color: '#38bdf8' }),
-    ev(1, 14, 0, 120, 'Lumen pitch rehearsal', { projectId: 'p-lumen', color: '#f472b6' }),
-    ev(2, 8, 0, 60, 'Breakfast: new business prospect', { color: '#34d399', location: 'Hotel lobby' }),
-    ev(2, 11, 0, 90, 'Lumen Skincare: final pitch', { projectId: 'p-lumen', color: '#f472b6', location: 'Client HQ' }),
-    ev(3, 10, 0, 60, 'Vertex spokesperson training', { projectId: 'p-vertex', color: '#f87171' }),
-    ev(3, 16, 0, 45, 'Weekly finance check-in', { color: '#2dd4bf' }),
-    ev(4, 9, 0, 30, 'Team stand-up', { color: '#8b6cff' }),
-    ev(4, 12, 30, 60, 'Creator briefing: Autumn Blend', { projectId: 'p-northwind', color: '#f59e0b' }),
-    ev(-1, 11, 0, 60, 'Northwind: pop-up venue walk-through', { projectId: 'p-northwind', color: '#f59e0b' }),
-    ev(-2, 15, 0, 60, 'Quarterly planning', { color: '#8b6cff' }),
-  ]
+    const events: CalEvent[] = [
+      ev(0, 9, 0, 30, 'Team stand-up', { location: 'Studio', color: '#8b6cff' }),
+      ev(0, 10, 30, 60, 'Northwind: press release sign-off', {
+        projectId: 'p-northwind',
+        color: '#f59e0b',
+        location: 'Video call',
+        description: 'Walk the client through the final release and embargo plan.',
+      }),
+      ev(0, 13, 0, 60, 'Lunch with Priya Shah (The Daily Ledger)', { location: 'The Corner Café', color: '#34d399' }),
+      ev(0, 15, 0, 90, 'Lumen pitch: creative workshop', { projectId: 'p-lumen', color: '#f472b6', description: 'Pick the lead creative territory for the pitch.' }),
+      ev(0, 17, 30, 30, 'Call: Vertex comms director', { projectId: 'p-vertex', color: '#f87171' }),
+      ev(1, 9, 30, 60, 'Harbour Lights partnership call', { projectId: 'p-harbour', color: '#38bdf8' }),
+      ev(1, 14, 0, 120, 'Lumen pitch rehearsal', { projectId: 'p-lumen', color: '#f472b6' }),
+      ev(2, 8, 0, 60, 'Breakfast: new business prospect', { color: '#34d399', location: 'Hotel lobby' }),
+      ev(2, 11, 0, 90, 'Lumen Skincare: final pitch', { projectId: 'p-lumen', color: '#f472b6', location: 'Client HQ' }),
+      ev(3, 10, 0, 60, 'Vertex spokesperson training', { projectId: 'p-vertex', color: '#f87171' }),
+      ev(3, 16, 0, 45, 'Weekly finance check-in', { color: '#2dd4bf' }),
+      ev(4, 9, 0, 30, 'Team stand-up', { color: '#8b6cff' }),
+      ev(4, 12, 30, 60, 'Creator briefing: Autumn Blend', { projectId: 'p-northwind', color: '#f59e0b' }),
+      ev(-1, 11, 0, 60, 'Northwind: pop-up venue walk-through', { projectId: 'p-northwind', color: '#f59e0b' }),
+      ev(-2, 15, 0, 60, 'Quarterly planning', { color: '#8b6cff' }),
+    ]
     await db.events.bulkPut(events)
     await db.kv.put({ key: DEMO_WEEK_KEY, value: weekStart })
   })

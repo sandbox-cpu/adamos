@@ -84,7 +84,10 @@ function buildNetwork(count: number) {
     } else {
       const [a, b] = edges[Math.floor(rand() * edges.length)]
       const t = rand()
-      p = clusters[a].clone().lerp(clusters[b], t).add(new THREE.Vector3((rand() - 0.5) * 0.05, (rand() - 0.5) * 0.05, (rand() - 0.5) * 0.05))
+      p = clusters[a]
+        .clone()
+        .lerp(clusters[b], t)
+        .add(new THREE.Vector3((rand() - 0.5) * 0.05, (rand() - 0.5) * 0.05, (rand() - 0.5) * 0.05))
     }
     target[i * 3] = p.x
     target[i * 3 + 1] = p.y
@@ -112,11 +115,27 @@ function Scene({ signals, agentColors }: { signals: MutableRefObject<HeroSignals
   const net = useMemo(() => buildNetwork(4200), [])
 
   const orbUniforms = useMemo(
-    () => ({ uTime: { value: 0 }, uAmp: { value: 0.18 }, uFreq: { value: 1.1 }, uGlow: { value: 1.2 }, uColorA: { value: colors.a }, uColorB: { value: colors.b }, uColorC: { value: colors.c } }),
+    () => ({
+      uTime: { value: 0 },
+      uAmp: { value: 0.18 },
+      uFreq: { value: 1.1 },
+      uGlow: { value: 1.2 },
+      uColorA: { value: colors.a },
+      uColorB: { value: colors.b },
+      uColorC: { value: colors.c },
+    }),
     [colors],
   )
   const particleUniforms = useMemo(
-    () => ({ uTime: { value: 0 }, uMorph: { value: 0 }, uPixelRatio: { value: Math.min(gl.getPixelRatio(), 2) }, uSpin: { value: 1 }, uOpacity: { value: 0 }, uColorA: { value: colors.a }, uColorB: { value: colors.b } }),
+    () => ({
+      uTime: { value: 0 },
+      uMorph: { value: 0 },
+      uPixelRatio: { value: Math.min(gl.getPixelRatio(), 2) },
+      uSpin: { value: 1 },
+      uOpacity: { value: 0 },
+      uColorA: { value: colors.a },
+      uColorB: { value: colors.b },
+    }),
     [colors, gl],
   )
   const orbits = useMemo(() => {
@@ -140,24 +159,64 @@ function Scene({ signals, agentColors }: { signals: MutableRefObject<HeroSignals
     const p = s.p
     const leave = sig.leaving
 
-    const camZ = keyframes(p, [[0, 7.4], [0.22, 9.2], [0.48, 7.6], [0.74, 6.6], [1, 4.2]]) - leave * 3.6
-    const camY = keyframes(p, [[0, 0], [0.22, 1.4], [0.48, 0.5], [0.74, -0.3], [1, 0]])
+    const camZ =
+      keyframes(p, [
+        [0, 7.4],
+        [0.22, 9.2],
+        [0.48, 7.6],
+        [0.74, 6.6],
+        [1, 4.2],
+      ]) -
+      leave * 3.6
+    const camY = keyframes(p, [
+      [0, 0],
+      [0.22, 1.4],
+      [0.48, 0.5],
+      [0.74, -0.3],
+      [1, 0],
+    ])
     camera.position.set(s.mx * 0.6, camY + s.my * 0.35, camZ)
     camera.lookAt(0, 0, 0)
 
     const orbU = (orb.current?.material as THREE.ShaderMaterial | undefined)?.uniforms
     const partU = (points.current?.material as THREE.ShaderMaterial | undefined)?.uniforms
     if (orb.current && orbU) {
-      const scale = keyframes(p, [[0, 1], [0.22, 0.5], [0.48, 0.55], [0.74, 0.5], [1, 1.05]]) * (1 + leave * 2.2)
+      const scale =
+        keyframes(p, [
+          [0, 1],
+          [0.22, 0.5],
+          [0.48, 0.55],
+          [0.74, 0.5],
+          [1, 1.05],
+        ]) *
+        (1 + leave * 2.2)
       orb.current.scale.setScalar(scale)
       orb.current.rotation.y = t * 0.12
       orb.current.rotation.x = Math.sin(t * 0.2) * 0.2
       orbU.uTime.value = t
-      orbU.uAmp.value = 0.16 + keyframes(p, [[0, 0], [0.8, 0.05], [1, 0.14]]) + leave * 0.2
-      orbU.uGlow.value = 0.75 + keyframes(p, [[0, 0], [1, 0.7]]) + leave * 2
+      orbU.uAmp.value =
+        0.16 +
+        keyframes(p, [
+          [0, 0],
+          [0.8, 0.05],
+          [1, 0.14],
+        ]) +
+        leave * 0.2
+      orbU.uGlow.value =
+        0.75 +
+        keyframes(p, [
+          [0, 0],
+          [1, 0.7],
+        ]) +
+        leave * 2
     }
 
-    const morph = keyframes(p, [[0.12, 0], [0.34, 1], [0.66, 1], [0.86, 0.15]])
+    const morph = keyframes(p, [
+      [0.12, 0],
+      [0.34, 1],
+      [0.66, 1],
+      [0.86, 0.15],
+    ])
     if (partU) {
       partU.uTime.value = t
       partU.uMorph.value = morph
@@ -172,7 +231,14 @@ function Scene({ signals, agentColors }: { signals: MutableRefObject<HeroSignals
       lines.current.rotation.y = points.current?.rotation.y ?? 0
     }
 
-    const ringVis = keyframes(p, [[0, 1], [0.2, 0.2], [0.5, 0.9], [0.9, 1]]) * (1 - leave)
+    const ringVis =
+      keyframes(p, [
+        [0, 1],
+        [0.2, 0.2],
+        [0.5, 0.9],
+        [0.9, 1],
+      ]) *
+      (1 - leave)
     if (ringA.current) {
       ringA.current.rotation.set(1.15 + Math.sin(t * 0.3) * 0.1, t * 0.2, 0.4)
       ;(ringA.current.material as THREE.MeshBasicMaterial).opacity = 0.55 * ringVis
@@ -182,7 +248,14 @@ function Scene({ signals, agentColors }: { signals: MutableRefObject<HeroSignals
       ;(ringB.current.material as THREE.MeshBasicMaterial).opacity = 0.35 * ringVis
     }
 
-    const satVis = keyframes(p, [[0.36, 0], [0.5, 1], [0.8, 1], [0.95, 0.4]]) * (1 - leave)
+    const satVis =
+      keyframes(p, [
+        [0.36, 0],
+        [0.5, 1],
+        [0.8, 1],
+        [0.95, 0.4],
+      ]) *
+      (1 - leave)
     if (satellites.current) {
       satellites.current.children.forEach((child, i) => {
         const o = orbits[i]
@@ -218,7 +291,14 @@ function Scene({ signals, agentColors }: { signals: MutableRefObject<HeroSignals
           <bufferAttribute attach="attributes-aSeed" args={[net.seed, 1]} />
           <bufferAttribute attach="attributes-aSize" args={[net.size, 1]} />
         </bufferGeometry>
-        <shaderMaterial vertexShader={PARTICLE_VERTEX} fragmentShader={PARTICLE_FRAGMENT} uniforms={particleUniforms} transparent depthWrite={false} blending={THREE.AdditiveBlending} />
+        <shaderMaterial
+          vertexShader={PARTICLE_VERTEX}
+          fragmentShader={PARTICLE_FRAGMENT}
+          uniforms={particleUniforms}
+          transparent
+          depthWrite={false}
+          blending={THREE.AdditiveBlending}
+        />
       </points>
       <lineSegments ref={lines}>
         <bufferGeometry>

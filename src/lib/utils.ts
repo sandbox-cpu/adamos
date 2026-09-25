@@ -96,7 +96,7 @@ export function firstName(name: string): string {
 }
 
 export function plural(n: number, word: string, pluralWord?: string): string {
-  return `${n} ${n === 1 ? word : pluralWord ?? word + 's'}`
+  return `${n} ${n === 1 ? word : (pluralWord ?? word + 's')}`
 }
 
 export function formatNumber(n: number): string {
@@ -108,7 +108,13 @@ export function formatNumber(n: number): string {
 
 export function hexToRgba(hex: string, alpha: number): string {
   const h = hex.replace('#', '')
-  const full = h.length === 3 ? h.split('').map((c) => c + c).join('') : h
+  const full =
+    h.length === 3
+      ? h
+          .split('')
+          .map((c) => c + c)
+          .join('')
+      : h
   const num = parseInt(full.slice(0, 6), 16)
   const r = (num >> 16) & 255
   const g = (num >> 8) & 255
@@ -137,7 +143,13 @@ export function slugify(text: string): string {
 
 /** Filename safe for every desktop OS. */
 export function safeFileName(text: string): string {
-  return text.replace(/[\\/:*?"<>|#^[\]]+/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 120) || 'Untitled'
+  return (
+    text
+      .replace(/[\\/:*?"<>|#^[\]]+/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 120) || 'Untitled'
+  )
 }
 
 export function downloadBlob(blob: Blob, filename: string): void {

@@ -134,15 +134,41 @@ function demoSite(site: Site): unknown {
     pageTitle: site.name,
     suggestedTheme: site.theme.presetId,
     sections: [
-      { type: 'hero', eyebrow: 'Introducing', heading: truncate(b.purpose || site.name, 70), subheading: `Made for ${b.audience || 'people who want more'}.`, ctaLabel: cta, ctaHref: link, cta2Label: 'Learn more', cta2Href: '#features', imagePrompt: `${b.purpose}, bright aspirational lifestyle scene` },
+      {
+        type: 'hero',
+        eyebrow: 'Introducing',
+        heading: truncate(b.purpose || site.name, 70),
+        subheading: `Made for ${b.audience || 'people who want more'}.`,
+        ctaLabel: cta,
+        ctaHref: link,
+        cta2Label: 'Learn more',
+        cta2Href: '#features',
+        imagePrompt: `${b.purpose}, bright aspirational lifestyle scene`,
+      },
       {
         type: 'features',
         eyebrow: 'Why it matters',
         heading: 'Everything you need, nothing you don’t',
-        items: (points.length ? points : ['Simple to start', 'Built for real life', 'Backed by experts']).slice(0, 3).map((p, i) => ({ icon: ['✨', '⚡', '🤝'][i], title: truncate(p, 40), body: 'A short, clear sentence explaining why this makes a difference.' })),
+        items: (points.length ? points : ['Simple to start', 'Built for real life', 'Backed by experts'])
+          .slice(0, 3)
+          .map((p, i) => ({ icon: ['✨', '⚡', '🤝'][i], title: truncate(p, 40), body: 'A short, clear sentence explaining why this makes a difference.' })),
       },
-      { type: 'split', eyebrow: 'The story', heading: 'Why we made this', body: 'Tell the story behind the launch in two short paragraphs: the problem, the moment of insight and the difference it makes.', ctaLabel: cta, ctaHref: link },
-      { type: 'faq', heading: 'Questions, answered', items: [{ title: 'Who is it for?', body: b.audience || 'Anyone who wants a better way.' }, { title: 'How do I get started?', body: `Just click “${cta}”.` }] },
+      {
+        type: 'split',
+        eyebrow: 'The story',
+        heading: 'Why we made this',
+        body: 'Tell the story behind the launch in two short paragraphs: the problem, the moment of insight and the difference it makes.',
+        ctaLabel: cta,
+        ctaHref: link,
+      },
+      {
+        type: 'faq',
+        heading: 'Questions, answered',
+        items: [
+          { title: 'Who is it for?', body: b.audience || 'Anyone who wants a better way.' },
+          { title: 'How do I get started?', body: `Just click “${cta}”.` },
+        ],
+      },
       { type: 'cta', heading: 'Ready when you are', body: 'It only takes a minute to get started.', ctaLabel: cta, ctaHref: link },
       { type: 'footer', heading: site.name, body: 'Made with care.' },
     ],
@@ -297,59 +323,64 @@ export async function reviseSite(siteId: string, instruction: string, signal?: A
   if (!site) return
   const agent = await siteAgent(site)
   await db.sites.update(siteId, { history: [...site.history, { prompt: instruction, at: Date.now() }] })
-  await trackJob({ id: `site-revise:${siteId}`, kind: 'site', title: `Updating ${site.name}`, stage: `${agent.name} is editing`, agentId: agent.id, link: `/sites/${siteId}` }, async () => {
-    await db.sites.update(siteId, { status: 'generating', stage: `${agent.name} is making your changes` })
-    try {
-      if (site.mode === 'freeform' && site.html) {
-        const res = await runAgent({
-          agent,
-          mode: 'studio',
-          prompt: `Here is the current landing page HTML:\n\n${site.html}\n\nChange request: ${instruction}\n\nReturn the complete updated HTML document.\n\n${FREEFORM_RULES}`,
-          toolAccess: 'none',
-          webSearch: false,
-          thinkingDepth: 'balanced',
-          maxTokens: 32000,
-          demo: { text: () => site.html ?? '' },
-          signal,
-        })
-        const html = extractHtml(res.text)
-        if (/<html/i.test(html)) await db.sites.update(siteId, { html: html.replace(/<script\b[^>]*\bsrc=[^>]*>\s*<\/script>/gi, '') })
-      } else {
-        const current = site.sections.map((s) => ({
-          type: s.type,
-          eyebrow: s.eyebrow,
-          heading: s.heading,
-          subheading: s.subheading,
-          body: s.body,
-          items: s.items,
-          ctaLabel: s.cta?.label,
-          ctaHref: s.cta?.href,
-          cta2Label: s.cta2?.label,
-          cta2Href: s.cta2?.href,
-        }))
-        const res = await runAgent({
-          agent,
-          mode: 'studio',
-          prompt: `Here is the current landing page as JSON:\n${JSON.stringify({ pageTitle: site.name, sections: current })}\n\nChange request: ${instruction}\n\nReturn the complete updated page. Keep sections that don’t need changes exactly as they are.\n\n${PAGE_RULES}`,
-          toolAccess: 'none',
-          webSearch: false,
-          thinkingDepth: 'balanced',
-          maxTokens: 16000,
-          json: { name: 'landing_page', schema: SITE_SCHEMA },
-          demo: { json: () => ({ pageTitle: site.name, sections: current.map((s, i) => (i === 0 ? { ...s, subheading: `${s.subheading ?? ''} (${truncate(instruction, 50)})` } : s)) }) },
-          signal,
-        })
-        const data = res.json as { sections?: unknown[] }
-        const sections = (data.sections ?? []).map((s, i) => {
-          const prev = site.sections[i]
-          return normaliseSection(s, prev && prev.type === (s as { type?: string })?.type ? prev : undefined)
-        })
-        if (sections.length) await db.sites.update(siteId, { sections })
+  await trackJob(
+    { id: `site-revise:${siteId}`, kind: 'site', title: `Updating ${site.name}`, stage: `${agent.name} is editing`, agentId: agent.id, link: `/sites/${siteId}` },
+    async () => {
+      await db.sites.update(siteId, { status: 'generating', stage: `${agent.name} is making your changes` })
+      try {
+        if (site.mode === 'freeform' && site.html) {
+          const res = await runAgent({
+            agent,
+            mode: 'studio',
+            prompt: `Here is the current landing page HTML:\n\n${site.html}\n\nChange request: ${instruction}\n\nReturn the complete updated HTML document.\n\n${FREEFORM_RULES}`,
+            toolAccess: 'none',
+            webSearch: false,
+            thinkingDepth: 'balanced',
+            maxTokens: 32000,
+            demo: { text: () => site.html ?? '' },
+            signal,
+          })
+          const html = extractHtml(res.text)
+          if (/<html/i.test(html)) await db.sites.update(siteId, { html: html.replace(/<script\b[^>]*\bsrc=[^>]*>\s*<\/script>/gi, '') })
+        } else {
+          const current = site.sections.map((s) => ({
+            type: s.type,
+            eyebrow: s.eyebrow,
+            heading: s.heading,
+            subheading: s.subheading,
+            body: s.body,
+            items: s.items,
+            ctaLabel: s.cta?.label,
+            ctaHref: s.cta?.href,
+            cta2Label: s.cta2?.label,
+            cta2Href: s.cta2?.href,
+          }))
+          const res = await runAgent({
+            agent,
+            mode: 'studio',
+            prompt: `Here is the current landing page as JSON:\n${JSON.stringify({ pageTitle: site.name, sections: current })}\n\nChange request: ${instruction}\n\nReturn the complete updated page. Keep sections that don’t need changes exactly as they are.\n\n${PAGE_RULES}`,
+            toolAccess: 'none',
+            webSearch: false,
+            thinkingDepth: 'balanced',
+            maxTokens: 16000,
+            json: { name: 'landing_page', schema: SITE_SCHEMA },
+            demo: {
+              json: () => ({ pageTitle: site.name, sections: current.map((s, i) => (i === 0 ? { ...s, subheading: `${s.subheading ?? ''} (${truncate(instruction, 50)})` } : s)) }),
+            },
+            signal,
+          })
+          const data = res.json as { sections?: unknown[] }
+          const sections = (data.sections ?? []).map((s, i) => {
+            const prev = site.sections[i]
+            return normaliseSection(s, prev && prev.type === (s as { type?: string })?.type ? prev : undefined)
+          })
+          if (sections.length) await db.sites.update(siteId, { sections })
+        }
+        await db.sites.update(siteId, { status: 'ready', stage: undefined, updatedAt: Date.now() })
+      } catch (err) {
+        await db.sites.update(siteId, { status: 'ready', stage: undefined })
+        throw err
       }
-      await db.sites.update(siteId, { status: 'ready', stage: undefined, updatedAt: Date.now() })
-    } catch (err) {
-      await db.sites.update(siteId, { status: 'ready', stage: undefined })
-      throw err
-    }
-  })
+    },
+  )
 }

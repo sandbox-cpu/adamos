@@ -98,7 +98,9 @@ export function ChatView({ conversation, compact, empty, draft, placeholder, aut
             onSend={onSend}
             onStop={() => stopConversation(conversation.id)}
             running={running}
-            placeholder={placeholder ?? (conversation.kind === 'group' ? 'Message the huddle… use @name to ask someone directly' : `Message ${participants[0]?.name ?? 'your agent'}…`)}
+            placeholder={
+              placeholder ?? (conversation.kind === 'group' ? 'Message the huddle… use @name to ask someone directly' : `Message ${participants[0]?.name ?? 'your agent'}…`)
+            }
             mentionAgents={conversation.kind === 'group' ? participants : undefined}
             allowAttachments={conversation.kind !== 'group'}
             autoFocus={autoFocus}

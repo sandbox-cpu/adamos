@@ -41,7 +41,9 @@ function JobsButton() {
         onClick={() => setOpen((o) => !o)}
         className={cn(
           'flex h-9 items-center gap-2 rounded-xl border px-3 text-xs font-medium transition',
-          running.length ? 'border-[color-mix(in_oklab,var(--accent)_40%,transparent)] bg-[color-mix(in_oklab,var(--accent)_12%,transparent)] text-fg' : 'border-white/[0.08] bg-white/[0.04] text-soft',
+          running.length
+            ? 'border-[color-mix(in_oklab,var(--accent)_40%,transparent)] bg-[color-mix(in_oklab,var(--accent)_12%,transparent)] text-fg'
+            : 'border-white/[0.08] bg-white/[0.04] text-soft',
         )}
       >
         {running.length ? <LoaderCircle className="size-3.5 animate-spin" /> : <CircleCheck className="size-3.5 text-good" />}
@@ -49,7 +51,12 @@ function JobsButton() {
       </button>
       <AnimatePresence>
         {open && (
-          <motion.div initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} className="glass-strong absolute right-0 top-11 z-50 w-80 rounded-2xl p-2">
+          <motion.div
+            initial={{ opacity: 0, y: -6 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            className="glass-strong absolute right-0 top-11 z-50 w-80 rounded-2xl p-2"
+          >
             <div className="px-2 pb-2 pt-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-faint">Agent work</div>
             {jobs.map((j) => {
               const agent = agents.find((a) => a.id === j.agentId)
@@ -65,7 +72,7 @@ function JobsButton() {
                   >
                     <div className="truncate text-[13px] text-fg">{j.title}</div>
                     <div className={cn('truncate text-[11px]', j.status === 'error' ? 'text-bad' : 'text-muted')}>
-                      {j.status === 'error' ? j.error ?? 'Failed' : j.status === 'running' ? j.stage : `Ready · ${timeAgo(j.startedAt)}`}
+                      {j.status === 'error' ? (j.error ?? 'Failed') : j.status === 'running' ? j.stage : `Ready · ${timeAgo(j.startedAt)}`}
                     </div>
                   </button>
                   {j.status === 'running' ? (
@@ -110,7 +117,11 @@ export function Topbar() {
   const setMobileNav = useUI((s) => s.setMobileNav)
   return (
     <header className="relative z-20 flex h-16 shrink-0 items-center gap-3 border-b border-white/[0.06] bg-ink-950/40 px-4 backdrop-blur-xl sm:px-6">
-      <button onClick={() => setMobileNav(true)} className="grid size-9 place-items-center rounded-xl text-muted hover:bg-white/[0.06] hover:text-fg lg:hidden" aria-label="Open navigation">
+      <button
+        onClick={() => setMobileNav(true)}
+        className="grid size-9 place-items-center rounded-xl text-muted hover:bg-white/[0.06] hover:text-fg lg:hidden"
+        aria-label="Open navigation"
+      >
         <MenuIcon className="size-5" />
       </button>
       <div className="min-w-0 flex-1">

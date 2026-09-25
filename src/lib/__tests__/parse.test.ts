@@ -7,12 +7,14 @@ describe('obsidian parsing', () => {
     const p = parseMarkdown(`---\ntags: [Client, food-drink]\naliases: [NW]\n---\n# Hello\nWorking on #launch/autumn and #Q4.\n\`#notatag\`\nIssue #123 is not a tag`)
     expect(p.tags).toEqual(expect.arrayContaining(['client', 'food-drink', 'launch/autumn', 'q4']))
     expect(p.tags).not.toContain('notatag')
-    expect(p.tags).not.toContain("123")
+    expect(p.tags).not.toContain('123')
     expect(p.aliases).toEqual(['NW'])
   })
 
   it('extracts wikilinks, embeds and markdown links but skips attachments', () => {
-    const p = parseMarkdown('See [[Clients/Northwind Coffee|Northwind]] and [[Launch Playbook#Steps]]. ![[chart.png]] ![[Embedded Note]] [doc](Other%20Note.md) [web](https://example.com/page.md)')
+    const p = parseMarkdown(
+      'See [[Clients/Northwind Coffee|Northwind]] and [[Launch Playbook#Steps]]. ![[chart.png]] ![[Embedded Note]] [doc](Other%20Note.md) [web](https://example.com/page.md)',
+    )
     expect(p.links).toEqual(['Clients/Northwind Coffee', 'Launch Playbook', 'Embedded Note', 'Other Note'])
   })
 

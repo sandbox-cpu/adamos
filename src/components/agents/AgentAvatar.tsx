@@ -36,22 +36,22 @@ export const AgentAvatar = memo(function AgentAvatar({ agent, size = 'md', activ
       <div
         className="absolute inset-0 overflow-hidden rounded-full"
         style={{
+          // clip-path keeps the spinning sheen inside the circle even when it is promoted to its own layer
+          clipPath: 'circle(50% at 50% 50%)',
           background: `radial-gradient(circle at 32% 26%, ${light} 0%, ${c} 36%, ${dark} 78%, #06070b 100%)`,
           boxShadow: `inset 0 0 0 1px rgb(255 255 255 / 0.14), inset 0 -${Math.max(2, s * 0.08)}px ${Math.max(4, s * 0.18)}px rgb(0 0 0 / 0.35), 0 ${Math.max(2, s * 0.12)}px ${Math.max(6, s * 0.4)}px -${Math.max(2, s * 0.14)}px ${c}`,
         }}
       >
         <div
           className={cn('absolute -inset-1/4 opacity-70 mix-blend-soft-light', (active || speaking) && 'animate-spin-slow')}
-          style={{ background: `conic-gradient(from 200deg, transparent 0deg, rgb(255 255 255 / 0.55) 60deg, transparent 140deg, ${mixHex(c, '#ffffff', 0.3)} 250deg, transparent 320deg)` }}
+          style={{
+            background: `conic-gradient(from 200deg, transparent 0deg, rgb(255 255 255 / 0.55) 60deg, transparent 140deg, ${mixHex(c, '#ffffff', 0.3)} 250deg, transparent 320deg)`,
+          }}
         />
         <div className="absolute inset-[7%] rounded-full" style={{ background: 'radial-gradient(circle at 30% 22%, rgb(255 255 255 / 0.55), transparent 32%)' }} />
       </div>
       <div className="absolute inset-0 grid place-items-center text-white drop-shadow-[0_1px_2px_rgb(0_0_0/0.5)]">
-        {size === 'xs' ? (
-          <span className="text-[10px] font-bold">{agent.name.slice(0, 1)}</span>
-        ) : (
-          <Icon name={iconName} style={{ width: iconSize, height: iconSize }} />
-        )}
+        {size === 'xs' ? <span className="text-[10px] font-bold">{agent.name.slice(0, 1)}</span> : <Icon name={iconName} style={{ width: iconSize, height: iconSize }} />}
       </div>
       {status && size !== 'xs' && (
         <span
@@ -90,7 +90,13 @@ export function UserAvatar({ name, size = 30 }: { name: string; size?: number })
   return (
     <div
       className="grid shrink-0 place-items-center rounded-full font-semibold text-white"
-      style={{ width: size, height: size, fontSize: size * 0.4, background: 'linear-gradient(135deg, var(--accent), var(--accent-2))', boxShadow: 'inset 0 0 0 1px rgb(255 255 255 / 0.2)' }}
+      style={{
+        width: size,
+        height: size,
+        fontSize: size * 0.4,
+        background: 'linear-gradient(135deg, var(--accent), var(--accent-2))',
+        boxShadow: 'inset 0 0 0 1px rgb(255 255 255 / 0.2)',
+      }}
     >
       {name.slice(0, 1).toUpperCase()}
     </div>

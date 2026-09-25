@@ -70,8 +70,7 @@ function renderSection(s: SiteSection, images: Record<string, string>, brand: st
     case 'features':
       return `<section class="features" id="${esc(s.id)}"><div class="container">${header(s, true)}<div class="grid grid-3">${items(s.items)
         .map(
-          (i) =>
-            `<article class="card reveal">${i.icon ? `<div class="icon">${esc(i.icon)}</div>` : ''}<h3>${esc(i.title)}</h3>${i.body ? `<p>${esc(i.body)}</p>` : ''}</article>`,
+          (i) => `<article class="card reveal">${i.icon ? `<div class="icon">${esc(i.icon)}</div>` : ''}<h3>${esc(i.title)}</h3>${i.body ? `<p>${esc(i.body)}</p>` : ''}</article>`,
         )
         .join('')}</div></div></section>`
     case 'stats':
@@ -81,7 +80,11 @@ function renderSection(s: SiteSection, images: Record<string, string>, brand: st
     case 'split':
       return `<section class="split" id="${esc(s.id)}"><div class="container split-grid${s.variant === 'reverse' ? ' reverse' : ''}">
   <div class="split-copy reveal">${s.eyebrow ? `<span class="eyebrow">${esc(s.eyebrow)}</span>` : ''}<h2>${esc(s.heading)}</h2>${paragraphs(s.body)}${
-    items(s.items).length ? `<ul class="ticks">${items(s.items).map((i) => `<li>${esc(i.title || i.body)}</li>`).join('')}</ul>` : ''
+    items(s.items).length
+      ? `<ul class="ticks">${items(s.items)
+          .map((i) => `<li>${esc(i.title || i.body)}</li>`)
+          .join('')}</ul>`
+      : ''
   }${buttons(s)}</div>
   <div class="split-media reveal">${img ? `<img src="${esc(img)}" alt="" loading="lazy">` : `<div class="panel"><span>${esc(brand)}</span></div>`}</div>
 </div></section>`

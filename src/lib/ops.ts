@@ -165,9 +165,7 @@ export async function eventsBetween(start: Date, end: Date): Promise<CalEvent[]>
   const sources = await db.calendars.toArray()
   const disabled = new Set(sources.filter((s) => !s.enabled).map((s) => s.id))
   const all = await db.events.where('start').below(end.toISOString()).toArray()
-  return all
-    .filter((e) => new Date(e.end).getTime() > start.getTime() && !(e.calendarId && disabled.has(e.calendarId)))
-    .sort((a, b) => a.start.localeCompare(b.start))
+  return all.filter((e) => new Date(e.end).getTime() > start.getTime() && !(e.calendarId && disabled.has(e.calendarId))).sort((a, b) => a.start.localeCompare(b.start))
 }
 
 /* ------------------------------------------------------------------ */

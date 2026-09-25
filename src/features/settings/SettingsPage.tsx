@@ -1,6 +1,26 @@
 import { useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
-import { Brain, CalendarDays, Check, Cpu, Database, Download, ImagePlus, Info, Keyboard, MoreHorizontal, Palette, Pencil, Plus, Sparkles, Star, Trash2, Upload, UserRound, Zap } from 'lucide-react'
+import {
+  Brain,
+  CalendarDays,
+  Check,
+  Cpu,
+  Database,
+  Download,
+  ImagePlus,
+  Info,
+  Keyboard,
+  MoreHorizontal,
+  Palette,
+  Pencil,
+  Plus,
+  Sparkles,
+  Star,
+  Trash2,
+  Upload,
+  UserRound,
+  Zap,
+} from 'lucide-react'
 import { db } from '../../lib/db'
 import { DEPTH_LABELS, getProvider, modelLabel } from '../../lib/llm/providers'
 import { testProfile } from '../../lib/llm'
@@ -125,7 +145,8 @@ function AISettings() {
           <div className="max-w-xl">
             <h2 className="font-display text-xl font-semibold">Your AI</h2>
             <p className="mt-1 text-sm text-muted">
-              Connect one or more AI services. Each agent can use a different one, so your researcher could run on Claude with live web search while your copywriter uses something else.
+              Connect one or more AI services. Each agent can use a different one, so your researcher could run on Claude with live web search while your copywriter uses something
+              else.
             </p>
           </div>
           <Button variant="primary" icon={<Plus />} onClick={() => setConnecting(true)}>
@@ -249,9 +270,15 @@ function AppearanceSettings() {
             <button
               key={a.id}
               onClick={() => void update({ accent: a.id })}
-              className={cn('flex flex-col items-center gap-2 rounded-2xl border p-3 transition', settings.accent === a.id ? 'border-white/40 bg-white/[0.06]' : 'border-white/[0.07] hover:border-white/20')}
+              className={cn(
+                'flex flex-col items-center gap-2 rounded-2xl border p-3 transition',
+                settings.accent === a.id ? 'border-white/40 bg-white/[0.06]' : 'border-white/[0.07] hover:border-white/20',
+              )}
             >
-              <span className="relative size-10 rounded-full" style={{ background: `linear-gradient(135deg, ${a.colors[0]}, ${a.colors[1]})`, boxShadow: `0 0 22px -4px ${a.colors[0]}` }}>
+              <span
+                className="relative size-10 rounded-full"
+                style={{ background: `linear-gradient(135deg, ${a.colors[0]}, ${a.colors[1]})`, boxShadow: `0 0 22px -4px ${a.colors[0]}` }}
+              >
                 {settings.accent === a.id && <Check className="absolute inset-0 m-auto size-5 text-white drop-shadow" />}
               </span>
               <span className="text-xs text-soft">{a.name}</span>
@@ -301,10 +328,20 @@ function IntegrationSettings() {
         <PanelHeader title="Calendar" icon={<CalendarDays />} subtitle="Google Calendar and iCal feeds" />
         <div className="space-y-4 px-5 pb-5">
           <Field label="Google OAuth client ID" hint="for Google Calendar">
-            <Input value={settings.calendar.googleClientId ?? ''} onChange={(e) => void update({ calendar: { googleClientId: e.target.value.trim() || undefined } })} placeholder="….apps.googleusercontent.com" className="font-mono text-[12px]" />
+            <Input
+              value={settings.calendar.googleClientId ?? ''}
+              onChange={(e) => void update({ calendar: { googleClientId: e.target.value.trim() || undefined } })}
+              placeholder="….apps.googleusercontent.com"
+              className="font-mono text-[12px]"
+            />
           </Field>
           <Field label="Proxy for iCal links" hint="optional, advanced">
-            <Input value={settings.calendar.corsProxy ?? ''} onChange={(e) => void update({ calendar: { corsProxy: e.target.value.trim() || undefined } })} placeholder="https://your-proxy.example/?url=" className="font-mono text-[12px]" />
+            <Input
+              value={settings.calendar.corsProxy ?? ''}
+              onChange={(e) => void update({ calendar: { corsProxy: e.target.value.trim() || undefined } })}
+              placeholder="https://your-proxy.example/?url="
+              className="font-mono text-[12px]"
+            />
           </Field>
           <Field label="Week starts on">
             <Select value={settings.calendar.weekStartsOn} onChange={(e) => void update({ calendar: { weekStartsOn: Number(e.target.value) as 0 | 1 } })}>
@@ -327,7 +364,12 @@ function IntegrationSettings() {
               <button
                 key={p.id}
                 onClick={() => void update({ media: { provider: p.id } })}
-                className={cn('rounded-2xl border p-4 text-left transition', active ? 'border-[color-mix(in_oklab,var(--accent)_60%,transparent)] bg-[color-mix(in_oklab,var(--accent)_10%,transparent)]' : 'border-white/[0.08] hover:border-white/20')}
+                className={cn(
+                  'rounded-2xl border p-4 text-left transition',
+                  active
+                    ? 'border-[color-mix(in_oklab,var(--accent)_60%,transparent)] bg-[color-mix(in_oklab,var(--accent)_10%,transparent)]'
+                    : 'border-white/[0.08] hover:border-white/20',
+                )}
               >
                 <div className="flex items-center justify-between">
                   <span className="font-medium">{p.name}</span>
@@ -354,7 +396,9 @@ function DataSettings() {
     <div className="grid max-w-5xl gap-5 lg:grid-cols-2">
       <Panel className="space-y-4 p-6">
         <h3 className="font-semibold">Backup</h3>
-        <p className="text-sm text-muted">Everything lives privately in this browser. Download a backup to move it to another computer. Your API keys stay encrypted inside the backup.</p>
+        <p className="text-sm text-muted">
+          Everything lives privately in this browser. Download a backup to move it to another computer. Your API keys stay encrypted inside the backup.
+        </p>
         <div className="flex flex-wrap gap-2">
           <Button
             variant="secondary"
@@ -449,7 +493,8 @@ function AboutSettings() {
           <h3 className="font-semibold">{osNameOf(settings)}</h3>
         </div>
         <p className="mt-3 text-sm text-muted">
-          A private, local-first operating system for your AI team. Your data stays in this browser, your keys are encrypted, and your agents talk directly to the AI services you choose.
+          A private, local-first operating system for your AI team. Your data stays in this browser, your keys are encrypted, and your agents talk directly to the AI services you
+          choose.
         </p>
         <p className="mt-3 text-xs text-faint">Version 1.0</p>
       </Panel>

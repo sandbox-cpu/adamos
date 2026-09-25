@@ -24,7 +24,19 @@ export function PanelHeader({ title, icon, subtitle, actions, className }: { tit
   )
 }
 
-export function PageHeader({ eyebrow, title, subtitle, actions, className }: { eyebrow?: ReactNode; title: ReactNode; subtitle?: ReactNode; actions?: ReactNode; className?: string }) {
+export function PageHeader({
+  eyebrow,
+  title,
+  subtitle,
+  actions,
+  className,
+}: {
+  eyebrow?: ReactNode
+  title: ReactNode
+  subtitle?: ReactNode
+  actions?: ReactNode
+  className?: string
+}) {
   return (
     <div className={cn('mb-7 flex flex-wrap items-end justify-between gap-4', className)}>
       <div className="min-w-0">

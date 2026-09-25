@@ -1,4 +1,4 @@
-import { useEffect, type ReactNode } from 'react'
+import { useEffect, useRef, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import { X } from 'lucide-react'
@@ -19,20 +19,44 @@ interface ModalProps {
 
 const widths = { sm: 'max-w-md', md: 'max-w-xl', lg: 'max-w-3xl', xl: 'max-w-5xl', full: 'max-w-[min(1400px,96vw)]' }
 
-export function Modal({ open, onClose, title, subtitle, icon, children, footer, size = 'md', className, hideClose }: ModalProps) {
+/** Only the top-most open overlay reacts to Escape, so a modal opened from a drawer closes on its own. */
+const layers: symbol[] = []
+
+export function useEscapeLayer(open: boolean, onClose: () => void) {
+  const close = useRef(onClose)
+  useEffect(() => {
+    close.current = onClose
+  })
   useEffect(() => {
     if (!open) return
+    const id = Symbol('layer')
+    layers.push(id)
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape' && layers[layers.length - 1] === id) {
+        e.preventDefault()
+        close.current()
+      }
     }
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [open, onClose])
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      layers.splice(layers.indexOf(id), 1)
+    }
+  }, [open])
+}
+
+export function Modal({ open, onClose, title, subtitle, icon, children, footer, size = 'md', className, hideClose }: ModalProps) {
+  useEscapeLayer(open, onClose)
 
   return createPortal(
     <AnimatePresence>
       {open && (
-        <motion.div className="fixed inset-0 z-[80] flex items-end justify-center p-0 sm:items-center sm:p-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+        <motion.div
+          className="fixed inset-0 z-[80] flex items-end justify-center p-0 sm:items-center sm:p-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+        >
           <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
           <motion.div
             role="dialog"
@@ -53,7 +77,11 @@ export function Modal({ open, onClose, title, subtitle, icon, children, footer, 
                   </div>
                 </div>
                 {!hideClose && (
-                  <button onClick={onClose} aria-label="Close" className="grid size-8 shrink-0 place-items-center rounded-lg text-muted transition hover:bg-white/[0.07] hover:text-fg">
+                  <button
+                    onClick={onClose}
+                    aria-label="Close"
+                    className="grid size-8 shrink-0 place-items-center rounded-lg text-muted transition hover:bg-white/[0.07] hover:text-fg"
+                  >
                     <X className="size-4" />
                   </button>
                 )}
@@ -69,15 +97,24 @@ export function Modal({ open, onClose, title, subtitle, icon, children, footer, 
   )
 }
 
-export function Drawer({ open, onClose, title, subtitle, children, footer, width = 'max-w-xl' }: { open: boolean; onClose: () => void; title?: ReactNode; subtitle?: ReactNode; children: ReactNode; footer?: ReactNode; width?: string }) {
-  useEffect(() => {
-    if (!open) return
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
-    }
-    window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
-  }, [open, onClose])
+export function Drawer({
+  open,
+  onClose,
+  title,
+  subtitle,
+  children,
+  footer,
+  width = 'max-w-xl',
+}: {
+  open: boolean
+  onClose: () => void
+  title?: ReactNode
+  subtitle?: ReactNode
+  children: ReactNode
+  footer?: ReactNode
+  width?: string
+}) {
+  useEscapeLayer(open, onClose)
   return createPortal(
     <AnimatePresence>
       {open && (

@@ -75,7 +75,19 @@ export function Field({ label, hint, children, className }: { label: ReactNode; 
   )
 }
 
-export function Toggle({ checked, onChange, label, description, disabled }: { checked: boolean; onChange: (v: boolean) => void; label?: ReactNode; description?: ReactNode; disabled?: boolean }) {
+export function Toggle({
+  checked,
+  onChange,
+  label,
+  description,
+  disabled,
+}: {
+  checked: boolean
+  onChange: (v: boolean) => void
+  label?: ReactNode
+  description?: ReactNode
+  disabled?: boolean
+}) {
   return (
     <label className={cn('flex cursor-pointer items-center justify-between gap-4', disabled && 'cursor-not-allowed opacity-50')}>
       {(label || description) && (
@@ -101,7 +113,23 @@ export function Toggle({ checked, onChange, label, description, disabled }: { ch
   )
 }
 
-export function Slider({ value, onChange, min = 0, max = 100, step = 1, left, right }: { value: number; onChange: (v: number) => void; min?: number; max?: number; step?: number; left?: string; right?: string }) {
+export function Slider({
+  value,
+  onChange,
+  min = 0,
+  max = 100,
+  step = 1,
+  left,
+  right,
+}: {
+  value: number
+  onChange: (v: number) => void
+  min?: number
+  max?: number
+  step?: number
+  left?: string
+  right?: string
+}) {
   const pct = ((value - min) / (max - min)) * 100
   return (
     <div>

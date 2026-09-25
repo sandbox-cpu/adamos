@@ -7,7 +7,10 @@ import { friendlyDate, isoDate } from '../utils'
 const DEMO_FOOTER = '\n\n_Demo answer: connect an AI provider in **Settings → AI** and I’ll respond properly, with live research and real actions._'
 
 function topicOf(prompt: string): string {
-  const cleaned = prompt.replace(/\s+/g, ' ').trim().replace(/[?.!]+$/, '')
+  const cleaned = prompt
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/[?.!]+$/, '')
   return cleaned.length > 80 ? cleaned.slice(0, 77) + '…' : cleaned || 'this'
 }
 
@@ -26,7 +29,9 @@ async function todaySummary(settings: Settings): Promise<string> {
     lines.push('\n**Needs your attention**')
     for (const t of dueSoon) lines.push(`- ${t.title} (${friendlyDate(t.dueDate)})`)
   }
-  lines.push('\n**Suggested focus**\n- Block 45 minutes before your biggest meeting to prepare.\n- Batch quick replies into one slot after lunch.\n- Hand anything writing-heavy to the team so you can stay in the room.')
+  lines.push(
+    '\n**Suggested focus**\n- Block 45 minutes before your biggest meeting to prepare.\n- Batch quick replies into one slot after lunch.\n- Hand anything writing-heavy to the team so you can stay in the room.',
+  )
   return lines.join('\n')
 }
 

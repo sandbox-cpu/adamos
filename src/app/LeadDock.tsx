@@ -15,7 +15,11 @@ function Starters({ onPick, starters }: { onPick: (s: string) => void; starters:
   return (
     <div className="grid gap-2">
       {starters.map((s) => (
-        <button key={s} onClick={() => onPick(s)} className="rounded-2xl border border-white/[0.07] bg-white/[0.03] px-3.5 py-2.5 text-left text-[13px] text-soft transition hover:border-white/15 hover:bg-white/[0.06] hover:text-fg">
+        <button
+          key={s}
+          onClick={() => onPick(s)}
+          className="rounded-2xl border border-white/[0.07] bg-white/[0.03] px-3.5 py-2.5 text-left text-[13px] text-soft transition hover:border-white/15 hover:bg-white/[0.06] hover:text-fg"
+        >
           {s}
         </button>
       ))}
@@ -100,7 +104,7 @@ export function LeadDock() {
               <AgentAvatar agent={lead} size="md" active={running} status={running ? 'working' : 'online'} />
               <div className="min-w-0 flex-1">
                 <div className="text-sm font-semibold">{lead.name}</div>
-                <div className="truncate text-xs text-muted">{running ? 'Working on it…' : role?.name ?? 'Lead agent'}</div>
+                <div className="truncate text-xs text-muted">{running ? 'Working on it…' : (role?.name ?? 'Lead agent')}</div>
               </div>
               <button
                 onClick={() => {
@@ -129,7 +133,9 @@ export function LeadDock() {
                     <div className="px-1 pb-6">
                       <div className="mb-5 flex flex-col items-center pt-4 text-center">
                         <AgentAvatar agent={lead} size="xl" active />
-                        <h3 className="mt-4 font-display text-xl font-semibold">Hi {userName}, I’m {lead.name}.</h3>
+                        <h3 className="mt-4 font-display text-xl font-semibold">
+                          Hi {userName}, I’m {lead.name}.
+                        </h3>
                         <p className="mt-1 max-w-xs text-sm text-muted">Tell me what’s on your mind. I’ll organise it, book it, or hand it to the right specialist.</p>
                       </div>
                       <Starters starters={role?.starters ?? []} onPick={(s) => (/[:\s]$/.test(s) ? setPrefill(s) : void sendDirect(conv.id, s))} />

@@ -24,7 +24,10 @@ async function mutate(id: string, fn: (s: MastermindSession) => MastermindSessio
     await db.masterminds.put(updated)
     return updated
   })
-  locks.set(id, next.catch(() => undefined))
+  locks.set(
+    id,
+    next.catch(() => undefined),
+  )
   return next
 }
 
@@ -72,7 +75,10 @@ async function briefing(session: MastermindSession, agents: Agent[]): Promise<st
   if (session.context) lines.push(`Background from ${settings.userName.split(' ')[0]}: ${session.context}`)
   if (session.projectId) {
     const p = await db.projects.get(session.projectId)
-    if (p) lines.push(`Project: ${p.name}${p.client ? ` for ${p.client}` : ''}${p.dueDate ? `, due ${p.dueDate}` : ''}. ${p.description ?? ''} Goals: ${p.goals.join('; ') || 'not set'}.`)
+    if (p)
+      lines.push(
+        `Project: ${p.name}${p.client ? ` for ${p.client}` : ''}${p.dueDate ? `, due ${p.dueDate}` : ''}. ${p.description ?? ''} Goals: ${p.goals.join('; ') || 'not set'}.`,
+      )
   }
   lines.push(`At the table: ${agents.map((a) => `${a.name} (${roleFor(roles, a).name})`).join(', ')}.`)
   return lines.join('\n')
@@ -109,7 +115,9 @@ async function runContribution(session: MastermindSession, agent: Agent, phase: 
     await mutate(session.id, (s) => ({
       ...s,
       contributions: s.contributions.map((c) =>
-        c.id === contribution.id ? { ...c, content: writer.value || (aborted ? '_Stopped._' : err instanceof Error ? err.message : 'Failed'), status: aborted ? 'done' : 'error' } : c,
+        c.id === contribution.id
+          ? { ...c, content: writer.value || (aborted ? '_Stopped._' : err instanceof Error ? err.message : 'Failed'), status: aborted ? 'done' : 'error' }
+          : c,
       ),
     }))
     if (aborted) throw err
@@ -189,7 +197,7 @@ const PLAN_SCHEMA: JSONSchema = {
 
 function normalisePlan(raw: unknown): ActionPlan {
   const r = (raw ?? {}) as Partial<ActionPlan> & { actions?: Partial<PlanAction>[] }
-  const arr = <T,>(v: T[] | undefined) => (Array.isArray(v) ? v : [])
+  const arr = <T>(v: T[] | undefined) => (Array.isArray(v) ? v : [])
   const prio = (p: unknown): Priority => (p === 'high' || p === 'low' ? p : 'medium')
   return {
     title: String(r.title ?? 'Action plan'),

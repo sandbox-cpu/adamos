@@ -34,7 +34,10 @@ export class FrameGrabber {
     this.video.muted = true
     this.video.playsInline = true
     this.video.srcObject = stream
-    this.ready = this.video.play().then(() => undefined).catch(() => undefined)
+    this.ready = this.video
+      .play()
+      .then(() => undefined)
+      .catch(() => undefined)
     this.tiny.width = 24
     this.tiny.height = 14
   }

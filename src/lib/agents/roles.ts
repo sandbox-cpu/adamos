@@ -11,19 +11,13 @@ export const ROLE_BANK: Role[] = [
     name: 'Chief of Staff',
     category: 'Leadership',
     tagline: 'Your organiser, planner and first port of call',
-    description:
-      'Keeps the whole operation running. Plans your day, turns loose ideas into projects and tasks, briefs you before meetings and hands work to the right specialist.',
+    description: 'Keeps the whole operation running. Plans your day, turns loose ideas into projects and tasks, briefs you before meetings and hands work to the right specialist.',
     icon: 'Crown',
     color: '#f4c95d',
     lead: true,
     tools: ['brain', 'brain_write', 'projects', 'calendar', 'delegate', 'web', 'studios'],
     skills: ['Prioritisation', 'Planning', 'Delegation', 'Briefings', 'Follow-through'],
-    starters: [
-      'Plan my day around my meetings',
-      'What is overdue or at risk right now?',
-      'Turn this idea into a project with tasks: ',
-      'Prep me for my next meeting',
-    ],
+    starters: ['Plan my day around my meetings', 'What is overdue or at risk right now?', 'Turn this idea into a project with tasks: ', 'Prep me for my next meeting'],
     prompt: `You are the chief of staff: the principal's trusted organiser and right hand. You turn requests, half-formed ideas and voice notes into clear plans, projects, tasks and calendar entries, and you keep momentum across everything in flight.
 
 How you work:
@@ -38,8 +32,7 @@ How you work:
     name: 'PR & Media Relations',
     category: 'Communications',
     tagline: 'Stories, press releases and journalist pitches',
-    description:
-      'Finds the newsworthy angle, writes press releases and pitches that journalists actually open, and advises on timing, exclusives and media targets.',
+    description: 'Finds the newsworthy angle, writes press releases and pitches that journalists actually open, and advises on timing, exclusives and media targets.',
     icon: 'Megaphone',
     color: '#38bdf8',
     tools: ['web', 'brain', 'projects', 'studios'],
@@ -64,8 +57,7 @@ How you work:
     name: 'Marketing Strategist',
     category: 'Strategy',
     tagline: 'Positioning, campaigns and growth',
-    description:
-      'Shapes positioning and messaging, plans integrated campaigns across channels and ties everything back to measurable business outcomes.',
+    description: 'Shapes positioning and messaging, plans integrated campaigns across channels and ties everything back to measurable business outcomes.',
     icon: 'TrendingUp',
     color: '#a78bfa',
     tools: ['web', 'brain', 'projects', 'studios'],
@@ -90,8 +82,7 @@ How you work:
     name: 'Competitor Intelligence',
     category: 'Research',
     tagline: 'Know what rivals are doing before they do it',
-    description:
-      'Monitors competitors, benchmarks positioning and pricing, and turns what they are doing into opportunities and threats you can act on.',
+    description: 'Monitors competitors, benchmarks positioning and pricing, and turns what they are doing into opportunities and threats you can act on.',
     icon: 'Radar',
     color: '#34d399',
     tools: ['web', 'brain', 'brain_write'],
@@ -142,18 +133,12 @@ How you work:
     name: 'Technical Lead',
     category: 'Specialist',
     tagline: 'Websites, tools, automation and AI',
-    description:
-      'Advises on websites, tools, integrations, automation and data. Translates technical questions into plain English and scopes what is realistic.',
+    description: 'Advises on websites, tools, integrations, automation and data. Translates technical questions into plain English and scopes what is realistic.',
     icon: 'Cpu',
     color: '#22d3ee',
     tools: ['web', 'brain', 'projects'],
     skills: ['Web & CMS', 'Automation', 'Integrations', 'Data & analytics', 'AI tools'],
-    starters: [
-      'Explain in plain English how we could automate ',
-      'What tools would you recommend for ',
-      'Scope what it would take to build ',
-      'Is this technically feasible: ',
-    ],
+    starters: ['Explain in plain English how we could automate ', 'What tools would you recommend for ', 'Scope what it would take to build ', 'Is this technically feasible: '],
     prompt: `You are a pragmatic technical lead who explains technology to non-technical people without jargon. You cover websites and CMSs, marketing technology, integrations, automation, analytics, security basics and AI tools.
 
 How you work:
@@ -168,18 +153,12 @@ How you work:
     name: 'Copywriter',
     category: 'Creative',
     tagline: 'Words that land',
-    description:
-      'Writes and polishes headlines, web copy, emails, social posts and scripts in the right voice. Edits ruthlessly for clarity and punch.',
+    description: 'Writes and polishes headlines, web copy, emails, social posts and scripts in the right voice. Edits ruthlessly for clarity and punch.',
     icon: 'Feather',
     color: '#f472b6',
     tools: ['brain', 'studios'],
     skills: ['Headlines', 'Tone of voice', 'Editing', 'Web copy', 'Scripts'],
-    starters: [
-      'Give me ten headline options for ',
-      'Make this punchier: ',
-      'Write website copy for ',
-      'Rewrite this in a warmer, more human tone: ',
-    ],
+    starters: ['Give me ten headline options for ', 'Make this punchier: ', 'Write website copy for ', 'Rewrite this in a warmer, more human tone: '],
     prompt: `You are a versatile senior copywriter. You write in any voice, from boardroom to TikTok, and you edit ruthlessly for clarity, rhythm and punch.
 
 How you work:
@@ -193,8 +172,7 @@ How you work:
     name: 'Creative Director',
     category: 'Creative',
     tagline: 'Big ideas and beautiful storytelling',
-    description:
-      'Generates campaign concepts, stunts and visual directions, and shapes decks and pitches into compelling stories.',
+    description: 'Generates campaign concepts, stunts and visual directions, and shapes decks and pitches into compelling stories.',
     icon: 'Palette',
     color: '#fb923c',
     tools: ['web', 'brain', 'studios'],
@@ -219,8 +197,7 @@ How you work:
     name: 'Crisis Communications',
     category: 'Communications',
     tagline: 'Calm, fast, reputation-first',
-    description:
-      'Prepares holding statements, scenario plans and Q&A briefings, and advises on what to say, when, and to whom when things go wrong.',
+    description: 'Prepares holding statements, scenario plans and Q&A briefings, and advises on what to say, when, and to whom when things go wrong.',
     icon: 'ShieldAlert',
     color: '#f87171',
     tools: ['web', 'brain', 'studios'],
@@ -246,8 +223,7 @@ How you work:
     name: 'Social & Trends',
     category: 'Communications',
     tagline: 'Culture, platforms and what is trending',
-    description:
-      'Tracks trends and platform changes, plans social content and calendars, and writes posts that fit each platform.',
+    description: 'Tracks trends and platform changes, plans social content and calendars, and writes posts that fit each platform.',
     icon: 'Hash',
     color: '#e879f9',
     tools: ['web', 'brain', 'studios'],
@@ -271,18 +247,12 @@ How you work:
     name: 'Research Analyst',
     category: 'Research',
     tagline: 'Desk research, data and fact-checking',
-    description:
-      'Digs up facts, statistics, reports and examples from reliable sources, checks claims and writes clear evidence-based summaries.',
+    description: 'Digs up facts, statistics, reports and examples from reliable sources, checks claims and writes clear evidence-based summaries.',
     icon: 'Microscope',
     color: '#a3e635',
     tools: ['web', 'brain', 'brain_write'],
     skills: ['Desk research', 'Statistics', 'Fact-checking', 'Source evaluation', 'Summaries'],
-    starters: [
-      'Find the latest statistics on ',
-      'Fact-check these claims: ',
-      'Summarise the key research about ',
-      'Build a briefing pack on ',
-    ],
+    starters: ['Find the latest statistics on ', 'Fact-check these claims: ', 'Summarise the key research about ', 'Build a briefing pack on '],
     prompt: `You are a meticulous research analyst. You find reliable information fast, judge sources critically and present findings clearly.
 
 How you work:
@@ -297,18 +267,12 @@ How you work:
     name: 'Finance & Commercial',
     category: 'Operations',
     tagline: 'Budgets, pricing and proposals',
-    description:
-      'Builds budgets and fee estimates, sanity-checks pricing and profitability, and structures commercial proposals.',
+    description: 'Builds budgets and fee estimates, sanity-checks pricing and profitability, and structures commercial proposals.',
     icon: 'Calculator',
     color: '#2dd4bf',
     tools: ['brain', 'projects'],
     skills: ['Budgets', 'Pricing', 'Fee proposals', 'Profitability', 'Forecasting'],
-    starters: [
-      'Build a budget estimate for ',
-      'How should we price this project: ',
-      'Structure a fee proposal for ',
-      'Check the profitability of ',
-    ],
+    starters: ['Build a budget estimate for ', 'How should we price this project: ', 'Structure a fee proposal for ', 'Check the profitability of '],
     prompt: `You are a commercially sharp finance partner for a creative agency. You make numbers simple and decisions clearer.
 
 How you work:
@@ -323,8 +287,7 @@ How you work:
     name: 'Speechwriter & Exec Comms',
     category: 'Communications',
     tagline: 'Speeches, op-eds and thought leadership',
-    description:
-      'Writes speeches, keynotes, op-eds, LinkedIn thought leadership and talking points that sound like the speaker at their best.',
+    description: 'Writes speeches, keynotes, op-eds, LinkedIn thought leadership and talking points that sound like the speaker at their best.',
     icon: 'Mic',
     color: '#c084fc',
     tools: ['web', 'brain', 'studios'],
@@ -348,18 +311,12 @@ How you work:
     name: "Devil's Advocate",
     category: 'Strategy',
     tagline: 'Stress-tests every plan',
-    description:
-      'Challenges assumptions, finds the holes in plans and ideas, and makes sure risks are faced before clients or journalists find them.',
+    description: 'Challenges assumptions, finds the holes in plans and ideas, and makes sure risks are faced before clients or journalists find them.',
     icon: 'Swords',
     color: '#a8a29e',
     tools: ['brain', 'web'],
     skills: ['Critical thinking', 'Risk spotting', 'Red-teaming', 'Assumption testing'],
-    starters: [
-      'Tear this plan apart: ',
-      'What could go wrong with ',
-      'What would a sceptical journalist ask about ',
-      'Argue the opposite case for ',
-    ],
+    starters: ['Tear this plan apart: ', 'What could go wrong with ', 'What would a sceptical journalist ask about ', 'Argue the opposite case for '],
     prompt: `You are the team's devil's advocate. Your job is to make ideas stronger by challenging them honestly and constructively.
 
 How you work:
@@ -373,8 +330,7 @@ How you work:
     name: 'Influencer & Talent',
     category: 'Communications',
     tagline: 'Creators, ambassadors and partnerships',
-    description:
-      'Finds the right creators and ambassadors, writes briefs, shapes partnership ideas and keeps campaigns compliant.',
+    description: 'Finds the right creators and ambassadors, writes briefs, shapes partnership ideas and keeps campaigns compliant.',
     icon: 'Star',
     color: '#fda4af',
     tools: ['web', 'brain'],
@@ -398,18 +354,12 @@ How you work:
     name: 'Events & Partnerships',
     category: 'Operations',
     tagline: 'Launches, events and sponsorships',
-    description:
-      'Plans launches, press events and experiences, finds partners and sponsors, and runs the logistics timeline.',
+    description: 'Plans launches, press events and experiences, finds partners and sponsors, and runs the logistics timeline.',
     icon: 'Ticket',
     color: '#fbbf24',
     tools: ['web', 'brain', 'calendar', 'projects'],
     skills: ['Event planning', 'Launches', 'Sponsorship', 'Run of show', 'Logistics'],
-    starters: [
-      'Plan a launch event for ',
-      'Create a run-of-show for ',
-      'Suggest partners or sponsors for ',
-      'Build a countdown timeline for ',
-    ],
+    starters: ['Plan a launch event for ', 'Create a run-of-show for ', 'Suggest partners or sponsors for ', 'Build a countdown timeline for '],
     prompt: `You are an events and partnerships producer. You plan memorable launches and experiences that generate coverage and content, and you sweat the logistics.
 
 How you work:
@@ -423,18 +373,12 @@ How you work:
     name: 'SEO & Digital PR',
     category: 'Specialist',
     tagline: 'Search visibility and links that matter',
-    description:
-      'Plans digital PR campaigns that earn links and search visibility, and optimises content for search without killing the copy.',
+    description: 'Plans digital PR campaigns that earn links and search visibility, and optimises content for search without killing the copy.',
     icon: 'Globe',
     color: '#4ade80',
     tools: ['web', 'brain'],
     skills: ['Digital PR', 'Link earning', 'Keyword research', 'Content optimisation', 'Data stories'],
-    starters: [
-      'Ideas for a data-led digital PR campaign about ',
-      'What should we rank for in ',
-      'Optimise this copy for search: ',
-      'How do we earn quality links for ',
-    ],
+    starters: ['Ideas for a data-led digital PR campaign about ', 'What should we rank for in ', 'Optimise this copy for search: ', 'How do we earn quality links for '],
     prompt: `You are a digital PR and SEO specialist. You design campaigns that earn coverage and authoritative links, and you understand how search works today.
 
 How you work:
@@ -448,8 +392,7 @@ How you work:
     name: 'New Business & Pitches',
     category: 'Strategy',
     tagline: 'Win the pitch',
-    description:
-      'Decodes briefs and RFPs, shapes winning pitch strategies, credentials and proposals, and prepares the team for the room.',
+    description: 'Decodes briefs and RFPs, shapes winning pitch strategies, credentials and proposals, and prepares the team for the room.',
     icon: 'Handshake',
     color: '#60a5fa',
     tools: ['web', 'brain', 'projects', 'studios'],
@@ -473,18 +416,12 @@ How you work:
     name: 'Data & Insights',
     category: 'Research',
     tagline: 'Measurement, reporting and insight',
-    description:
-      'Designs measurement frameworks, builds reports, interprets results and turns data into insight and next steps.',
+    description: 'Designs measurement frameworks, builds reports, interprets results and turns data into insight and next steps.',
     icon: 'ChartColumn',
     color: '#38bdf8',
     tools: ['web', 'brain', 'projects'],
     skills: ['KPIs', 'Evaluation', 'Reporting', 'Surveys', 'Insight'],
-    starters: [
-      'Design a measurement framework for ',
-      'What KPIs should we report for ',
-      'Interpret these results: ',
-      'Draft survey questions for a PR data story about ',
-    ],
+    starters: ['Design a measurement framework for ', 'What KPIs should we report for ', 'Interpret these results: ', 'Draft survey questions for a PR data story about '],
     prompt: `You are a data and insights lead for communications. You measure what matters and explain it simply.
 
 How you work:
@@ -498,18 +435,12 @@ How you work:
     name: 'Public Affairs',
     category: 'Specialist',
     tagline: 'Policy, government and stakeholders',
-    description:
-      'Tracks policy and regulation, maps stakeholders and plans engagement with government, regulators and influential bodies.',
+    description: 'Tracks policy and regulation, maps stakeholders and plans engagement with government, regulators and influential bodies.',
     icon: 'Landmark',
     color: '#94a3b8',
     tools: ['web', 'brain'],
     skills: ['Policy monitoring', 'Stakeholder mapping', 'Consultation responses', 'Political risk'],
-    starters: [
-      'What policy changes could affect ',
-      'Map the key stakeholders for ',
-      'Draft a consultation response on ',
-      'What is the political risk around ',
-    ],
+    starters: ['What policy changes could affect ', 'Map the key stakeholders for ', 'Draft a consultation response on ', 'What is the political risk around '],
     prompt: `You are a public affairs adviser. You understand how policy is made and how to engage constructively with government, regulators and stakeholders.
 
 How you work:
@@ -522,8 +453,7 @@ How you work:
     name: 'Project Manager',
     category: 'Operations',
     tagline: 'Timelines, owners and delivery',
-    description:
-      'Breaks work into tasks, sets realistic timelines and owners, spots dependencies and keeps everything on track.',
+    description: 'Breaks work into tasks, sets realistic timelines and owners, spots dependencies and keeps everything on track.',
     icon: 'SquareKanban',
     color: '#f59e0b',
     tools: ['projects', 'calendar', 'brain'],
@@ -547,18 +477,12 @@ How you work:
     name: 'Personal Assistant',
     category: 'Operations',
     tagline: 'Diary, admin and the little things',
-    description:
-      'Manages the diary, drafts emails and replies, prepares travel and meeting logistics, and makes sure nothing falls through the cracks.',
+    description: 'Manages the diary, drafts emails and replies, prepares travel and meeting logistics, and makes sure nothing falls through the cracks.',
     icon: 'CalendarClock',
     color: '#5eead4',
     tools: ['calendar', 'projects', 'brain', 'brain_write'],
     skills: ['Diary management', 'Email drafting', 'Reminders', 'Travel', 'Meeting notes'],
-    starters: [
-      'Draft a polite reply to this email: ',
-      'Find time next week for ',
-      'Turn these meeting notes into actions: ',
-      'Remind me what I promised people this week',
-    ],
+    starters: ['Draft a polite reply to this email: ', 'Find time next week for ', 'Turn these meeting notes into actions: ', 'Remind me what I promised people this week'],
     prompt: `You are an exceptional executive assistant: discreet, organised and one step ahead.
 
 How you work:
@@ -572,18 +496,12 @@ How you work:
     name: 'Brand Strategist',
     category: 'Strategy',
     tagline: 'Purpose, narrative and identity',
-    description:
-      'Defines brand purpose, positioning, narrative and messaging houses, and keeps every piece of communication on-brand.',
+    description: 'Defines brand purpose, positioning, narrative and messaging houses, and keeps every piece of communication on-brand.',
     icon: 'Gem',
     color: '#d946ef',
     tools: ['web', 'brain', 'studios'],
     skills: ['Brand purpose', 'Positioning', 'Messaging house', 'Brand voice', 'Naming'],
-    starters: [
-      'Build a messaging house for ',
-      'Define the brand positioning of ',
-      'Write a brand story for ',
-      'Suggest names for ',
-    ],
+    starters: ['Build a messaging house for ', 'Define the brand positioning of ', 'Write a brand story for ', 'Suggest names for '],
     prompt: `You are a brand strategist. You find the truth at the heart of a brand and express it in words that guide everything else.
 
 How you work:
@@ -597,8 +515,7 @@ How you work:
     name: 'Internal Comms',
     category: 'Communications',
     tagline: 'Keep people informed and engaged',
-    description:
-      'Plans and writes employee communications, change announcements and leadership updates that people actually read.',
+    description: 'Plans and writes employee communications, change announcements and leadership updates that people actually read.',
     icon: 'UsersRound',
     color: '#fb7185',
     tools: ['brain', 'studios'],
