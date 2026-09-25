@@ -2,7 +2,7 @@ import { memo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'motion/react'
 import { format } from 'date-fns'
-import { Brain, Check, ChevronDown, Copy, ExternalLink, Info, ListPlus, RefreshCw, Sparkles, TriangleAlert, Volume2 } from 'lucide-react'
+import { Brain, Check, ChevronDown, CircleCheck, Copy, ExternalLink, Info, ListChecks, ListPlus, RefreshCw, Sparkles, TriangleAlert, Volume2 } from 'lucide-react'
 import type { Agent, Message, Role } from '../../lib/types'
 import { useLive } from '../../stores/live'
 import { useSettings } from '../../stores/settings'
@@ -13,6 +13,7 @@ import { ActivityList } from './Activity'
 import { cn, copyText, truncate } from '../../lib/utils'
 import { saveNewNote } from '../../lib/brain/vault-fs'
 import { createTask } from '../../lib/ops'
+import { addSummaryActionsToBoard } from '../../lib/agents/chat'
 
 function domainOf(url: string): string {
   try {
@@ -187,6 +188,33 @@ export const MessageView = memo(function MessageView({ message, agent, role, age
                 </div>
               </div>
             </div>
+          </div>
+        )}
+
+        {!streaming && message.summary && message.summary.actions.length > 0 && (
+          <div className="mt-3 flex flex-wrap items-center gap-3 rounded-2xl border border-white/[0.08] bg-white/[0.03] px-4 py-3">
+            <ListChecks className="size-4 shrink-0 text-[var(--accent)]" />
+            <span className="flex-1 text-[13px] text-soft">
+              {message.summary.actions.length} next action{message.summary.actions.length === 1 ? '' : 's'} agreed
+            </span>
+            {message.summary.added ? (
+              <span className="flex items-center gap-1.5 text-[12.5px] text-good">
+                <CircleCheck className="size-4" /> On your task board
+              </span>
+            ) : (
+              <button
+                onClick={async () => {
+                  const n = await addSummaryActionsToBoard(message.id, projectId)
+                  toast.success(`${n} task${n === 1 ? '' : 's'} added`, 'Each one is assigned to the right person.', {
+                    label: 'View board',
+                    onClick: () => navigate(projectId ? `/projects/${projectId}` : '/projects'),
+                  })
+                }}
+                className="flex items-center gap-1.5 rounded-xl bg-[linear-gradient(120deg,var(--accent),var(--accent-2))] px-3 py-1.5 text-[12.5px] font-medium text-white shadow-[0_8px_24px_-10px_var(--accent)] transition hover:brightness-110"
+              >
+                <ListPlus className="size-3.5" /> Add to task board
+              </button>
+            )}
           </div>
         )}
 

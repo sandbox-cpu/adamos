@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'motion/react'
 import { Maximize2, X } from 'lucide-react'
-import { useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useLead, useRoleOf } from '../hooks/data'
 import { useUI } from '../stores/ui'
 import { useLive } from '../stores/live'
@@ -38,7 +38,10 @@ export function LeadDock() {
   const [prefill, setPrefill] = useState('')
   const running = useLive((s) => (conv ? !!s.running[conv.id] : false))
   const navigate = useNavigate()
+  const location = useLocation()
   const userName = useSettings((s) => s.settings.userName.split(' ')[0])
+  // Chat pages have their own message box where the floating button would sit.
+  const hideLauncher = /^\/(comms|huddle|live)(\/|$)/.test(location.pathname)
 
   useEffect(() => {
     if (open && lead) void getLeadConversation().then(setConv)
@@ -68,7 +71,7 @@ export function LeadDock() {
   return (
     <>
       <AnimatePresence>
-        {!open && (
+        {!open && !hideLauncher && (
           <motion.button
             initial={{ scale: 0.6, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}

@@ -34,14 +34,40 @@ export async function startConversation(input: { kind: ConversationKind; agentId
 
 /** The single long-running conversation with the lead agent. */
 export async function getLeadConversation(): Promise<Conversation> {
-  const lead = await getLeadAgent()
-  if (!lead) throw new FriendlyError('No lead agent found.', 'Choose a lead on the Agents page.')
-  const existing = (await db.conversations.where('kind').equals('lead').toArray()).sort((a, b) => b.updatedAt - a.updatedAt)[0]
-  if (existing) {
-    if (existing.agentIds[0] !== lead.id) await db.conversations.update(existing.id, { agentIds: [lead.id] })
-    return { ...existing, agentIds: [lead.id] }
-  }
-  return startConversation({ kind: 'lead', agentIds: [lead.id], title: lead.name })
+  // One transaction, so two callers at the same moment can't each create a conversation.
+  return db.transaction('rw', db.conversations, db.agents, async () => {
+    const lead = await getLeadAgent()
+    if (!lead) throw new FriendlyError('No lead agent found.', 'Choose a lead on the Agents page.')
+    const existing = (await db.conversations.where('kind').equals('lead').toArray()).sort((a, b) => b.updatedAt - a.updatedAt)[0]
+    if (existing) {
+      if (existing.agentIds[0] !== lead.id) await db.conversations.update(existing.id, { agentIds: [lead.id] })
+      return { ...existing, agentIds: [lead.id] }
+    }
+    return startConversation({ kind: 'lead', agentIds: [lead.id], title: lead.name })
+  })
+}
+
+/** The most recent one-to-one chat with an agent, started if there isn't one yet. */
+export async function openAgentChat(agentId: string): Promise<Conversation> {
+  return db.transaction('rw', db.conversations, db.agents, async () => {
+    const agent = await db.agents.get(agentId)
+    if (!agent) throw new FriendlyError('That agent is no longer on your team.')
+    const latest = (await db.conversations.filter((c) => (c.kind === 'direct' || c.kind === 'lead') && c.agentIds[0] === agentId).toArray()).sort(
+      (a, b) => b.updatedAt - a.updatedAt,
+    )[0]
+    if (latest) return latest
+    if (agent.isLead) return getLeadConversation()
+    return startConversation({ kind: 'direct', agentIds: [agentId] })
+  })
+}
+
+/** A fresh one-to-one thread, for starting a new subject with a clean slate. */
+export async function newThread(agentId: string): Promise<Conversation> {
+  return startConversation({ kind: 'direct', agentIds: [agentId], title: 'New chat' })
+}
+
+export async function renameConversation(id: string, title: string): Promise<void> {
+  if (title.trim()) await db.conversations.update(id, { title: title.trim() })
 }
 
 export async function deleteConversation(id: string): Promise<void> {
@@ -55,8 +81,21 @@ async function messagesOf(conversationId: string): Promise<Message[]> {
   return db.messages.where('[conversationId+createdAt]').between([conversationId, 0], [conversationId, Infinity]).toArray()
 }
 
+/** One plain line for chat lists: no Markdown symbols, links or line breaks. */
+function previewOf(text: string): string {
+  return truncate(
+    text
+      .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')
+      .replace(/^\s*(#{1,6}|[-*+]|\d+\.)\s+/gm, '')
+      .replace(/[*_`>|~]/g, '')
+      .replace(/\s+/g, ' ')
+      .trim(),
+    140,
+  )
+}
+
 async function touchConversation(id: string, preview: string) {
-  await db.conversations.update(id, { updatedAt: Date.now(), preview: truncate(preview.replace(/\s+/g, ' '), 140) })
+  await db.conversations.update(id, { updatedAt: Date.now(), preview: previewOf(preview) })
 }
 
 async function addUserMessage(conversationId: string, content: string): Promise<Message> {
@@ -194,8 +233,13 @@ export async function sendDirect(conversationId: string, text: string, att?: Att
   if (!conv) return
   const agent = await db.agents.get(conv.agentIds[0])
   if (!agent) return
-  const history = historyFor(await messagesOf(conversationId), agent.id)
+  const previous = await messagesOf(conversationId)
+  const history = historyFor(previous, agent.id)
   await addUserMessage(conversationId, text)
+  // Threads take their name from the first thing said in them.
+  if (conv.kind === 'direct' && !previous.some((m) => m.role === 'user')) {
+    await db.conversations.update(conversationId, { title: truncate(text.replace(/\s+/g, ' ').trim(), 60) })
+  }
   const context = await attachmentContext(att)
   await runWithController(conversationId, (signal) =>
     streamAgentMessage(conversationId, agent, { prompt: text, history, context, mode: conv.kind === 'lead' ? 'lead' : 'direct', latencySensitive: true }, signal),
@@ -231,6 +275,59 @@ export function stopConversation(conversationId: string): void {
 /* ------------------------------------------------------------------ */
 
 export const MAX_GROUP = 4
+
+const STOP_WORDS = new Set(
+  'a an and are as at be but by can do for from how i in into is it its me my of on or our should so that the their them this to us we what when where which who why will with you your'.split(
+    ' ',
+  ),
+)
+
+function words(text: string): string[] {
+  return text
+    .toLowerCase()
+    .split(/[^a-z0-9]+/)
+    .filter((w) => w.length > 2 && !STOP_WORDS.has(w))
+}
+
+/**
+ * Picks the best-placed agents for a topic by matching it against each role's
+ * expertise, then fills any gaps with a mix of perspectives.
+ */
+export function suggestParticipants(
+  topic: string,
+  agents: Agent[],
+  roles: { id: string; name: string; tagline: string; description: string; skills: string[]; category: string }[],
+  max = 3,
+): Agent[] {
+  const topicWords = new Set(words(topic))
+  const pool = agents.filter((a) => a.status === 'active' && !a.isLead)
+  const scored = pool
+    .map((a) => {
+      const role = roles.find((r) => r.id === a.roleId)
+      if (!role) return { agent: a, score: 0 }
+      const vocab = words([role.name, role.tagline, role.description, ...role.skills].join(' '))
+      let score = 0
+      for (const w of vocab) {
+        if (topicWords.has(w)) score += 2
+        else if ([...topicWords].some((t) => t.length > 4 && (w.startsWith(t.slice(0, 5)) || t.startsWith(w.slice(0, 5))))) score += 1
+      }
+      return { agent: a, score, category: role.category }
+    })
+    .sort((x, y) => y.score - x.score)
+  const picked = scored.filter((s) => s.score > 0).slice(0, max)
+  // Round out with different disciplines so the huddle has more than one viewpoint.
+  for (const s of scored) {
+    if (picked.length >= max) break
+    if (picked.some((p) => p.agent.id === s.agent.id)) continue
+    if (picked.some((p) => 'category' in p && 'category' in s && p.category === s.category) && scored.length > max) continue
+    picked.push(s)
+  }
+  for (const s of scored) {
+    if (picked.length >= max) break
+    if (!picked.some((p) => p.agent.id === s.agent.id)) picked.push(s)
+  }
+  return picked.map((p) => p.agent)
+}
 
 async function groupTranscript(conv: Conversation, agents: Agent[]): Promise<string> {
   const settings = useSettings.getState().settings
@@ -340,12 +437,16 @@ export async function summarizeGroup(conversationId: string): Promise<void> {
         webSearch: false,
         json: { name: 'discussion_summary', schema: SUMMARY_SCHEMA },
         demo: {
-          json: (): SummaryJson => ({
-            summary: `The team explored ${conv.topic || 'the brief'} from every angle and agreed a clear direction with a few open points to resolve.`,
-            decisions: ['Lead with one sharp, newsworthy angle', 'Keep the first phase lean and measurable'],
-            actions: everyone.slice(0, 3).map((a, i) => ({ title: `Draft next step for ${conv.topic || 'the project'} (${a.name})`, owner: a.name, due_in_days: 2 + i * 2 })),
-            open_questions: ['What budget is available for phase two?'],
-          }),
+          json: (): SummaryJson => {
+            const subject = truncate((conv.topic || 'the brief').replace(/[?.!]+$/, ''), 70)
+            const steps = ['Draft the lead angle and headline options', 'Build a target media list', 'Sketch the launch moment and visuals', 'Outline the measurement plan']
+            return {
+              summary: `The team pulled “${subject}” apart from every angle and agreed a clear direction, with a couple of open points to settle.`,
+              decisions: ['Lead with one sharp, newsworthy angle', 'Keep the first phase lean and measurable'],
+              actions: everyone.slice(0, 3).map((a, i) => ({ title: steps[i] ?? `Next step from ${a.name}`, owner: a.name, due_in_days: 2 + i * 2 })),
+              open_questions: ['What budget is available for phase two?'],
+            }
+          },
         },
         signal,
       })

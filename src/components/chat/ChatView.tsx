@@ -31,10 +31,14 @@ export function ChatView({ conversation, compact, empty, draft, placeholder, aut
     return last ? (s.messages[last.id]?.text.length ?? 0) + (s.messages[last.id]?.activities.length ?? 0) : 0
   })
 
+  // Also follow replies that arrive in one go (summaries and other structured answers).
+  const tail = messages[messages.length - 1]
+  const tailKey = tail ? `${tail.id}:${tail.status}:${tail.content.length}` : ''
+
   useLayoutEffect(() => {
     const el = scroller.current
     if (el && stuck) el.scrollTop = el.scrollHeight
-  }, [messages.length, liveLen, stuck])
+  }, [messages.length, liveLen, stuck, tailKey])
 
   useEffect(() => {
     const el = scroller.current
