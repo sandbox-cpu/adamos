@@ -1,7 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import '@fontsource-variable/inter'
-import '@fontsource-variable/bricolage-grotesque'
+import '@fontsource-variable/bricolage-grotesque/standard.css'
 import '@fontsource-variable/jetbrains-mono'
 import '@fontsource/instrument-serif'
 import '@fontsource/instrument-serif/400-italic.css'

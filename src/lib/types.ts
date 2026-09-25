@@ -644,6 +644,7 @@ export interface LogEntry {
   agentId?: ID
   minutesSaved?: number
   link?: string
+  demo?: boolean
 }
 
 /* ------------------------------------------------------------------ */

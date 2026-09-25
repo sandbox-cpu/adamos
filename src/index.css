@@ -418,6 +418,17 @@
     0%, 100% { font-variation-settings: "wght" 700, "wdth" 100; transform: translateY(0); }
     50% { font-variation-settings: "wght" 800, "wdth" 88; transform: translateY(-0.04em); }
   }
+  .caret-live > :last-child::after {
+    content: "";
+    display: inline-block;
+    width: 0.45em;
+    height: 1em;
+    margin-left: 0.15em;
+    vertical-align: -0.15em;
+    border-radius: 2px;
+    background: color-mix(in oklab, var(--accent) 70%, white);
+    animation: blink 1s steps(2, start) infinite;
+  }
   .caret::after {
     content: "";
     display: inline-block;

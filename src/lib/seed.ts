@@ -1,8 +1,9 @@
 import { addDays, format, set, startOfWeek } from 'date-fns'
-import { db, kvGet, kvSet } from './db'
+import { db } from './db'
 import { defaultAgents } from './agents/defaults'
 import { demoNotes } from './brain/demo'
 import type {
+  LogEntry,
   CalEvent,
   ContentPiece,
   CoverageItem,
@@ -19,17 +20,18 @@ import { SITE_PRESETS } from './sites/themes'
 const SEEDED_KEY = 'seeded.v1'
 const DEMO_WEEK_KEY = 'demo.eventsWeek'
 
+/** Safe to call concurrently: the check and the writes share one transaction. */
 export async function ensureSeeded(): Promise<boolean> {
-  const seeded = await kvGet<boolean>(SEEDED_KEY)
-  if (seeded) return false
-  await db.transaction('rw', [db.agents, db.projects, db.tasks, db.contacts, db.coverage, db.content, db.research, db.decks, db.sites, db.notes, db.kv], async () => {
+  const seededNow = await db.transaction('rw', [db.agents, db.projects, db.tasks, db.contacts, db.coverage, db.content, db.research, db.decks, db.sites, db.notes, db.log, db.kv], async () => {
+    if (await db.kv.get(SEEDED_KEY)) return false
     await db.agents.bulkPut(defaultAgents())
     await seedWorkspace()
     await db.notes.bulkPut(demoNotes())
     await db.kv.put({ key: SEEDED_KEY, value: true })
+    return true
   })
-  await refreshDemoEvents(true)
-  return true
+  if (seededNow) await refreshDemoEvents(true)
+  return seededNow
 }
 
 async function seedWorkspace() {
@@ -391,17 +393,41 @@ async function seedWorkspace() {
     ],
   }
   await db.sites.put(site)
+
+  const day = 86_400_000
+  const log: [number, LogEntry['kind'], string, string, number][] = [
+    [0.1, 'content', 'Echo drafted the Northwind press release', 'echo', 35],
+    [0.3, 'research', 'Scout finished a competitor scan for Lumen', 'scout', 75],
+    [0.9, 'deck', 'Iris built the Autumn Blend launch deck', 'iris', 150],
+    [1.2, 'plan', 'Mastermind produced the Vertex readiness plan', 'atlas', 90],
+    [1.6, 'site', 'Quill wrote the Autumn Blend landing page', 'quill', 120],
+    [2.2, 'brief', 'Atlas prepared your morning brief', 'atlas', 15],
+    [2.5, 'delegation', 'Atlas handed a contract review to Lex', 'lex', 15],
+    [3.1, 'content', 'Quill wrote social copy for Harbour Lights', 'quill', 35],
+    [3.8, 'meeting', 'Atlas summarised the Lumen chemistry meeting', 'atlas', 20],
+    [4.4, 'research', 'Nova mapped the Gen Z audience for Tidal', 'nova', 60],
+    [5.2, 'brief', 'Atlas prepared your morning brief', 'atlas', 15],
+    [6.1, 'content', 'Echo wrote three media pitches', 'echo', 45],
+    [7.3, 'task', 'Atlas organised 12 tasks across 3 projects', 'atlas', 20],
+    [8.5, 'research', 'Scout tracked EV launch coverage', 'scout', 60],
+    [9.4, 'deck', 'Iris refreshed the agency credentials deck', 'iris', 120],
+    [11.2, 'content', 'Echo drafted a holding statement for Vertex', 'echo', 35],
+    [12.6, 'plan', 'Mastermind planned the festival partnerships', 'atlas', 90],
+  ]
+  await db.log.bulkPut(
+    log.map(([ago, kind, text, agentId, minutesSaved]) => ({ id: uid(), at: t - ago * day, kind, text, agentId, minutesSaved, demo: true })),
+  )
 }
 
 /** Keeps demo meetings on the current week so the calendar always looks alive. */
 export async function refreshDemoEvents(force = false): Promise<void> {
   const weekStart = format(startOfWeek(new Date(), { weekStartsOn: 1 }), 'yyyy-MM-dd')
-  const stored = await kvGet<string>(DEMO_WEEK_KEY)
-  const settingsRow = await kvGet<{ demoData?: boolean }>('settings')
-  if (settingsRow && settingsRow.demoData === false) return
-  if (!force && stored === weekStart) return
-
-  await db.events.where('source').equals('local').filter((e) => !!e.demo).delete()
+  await db.transaction('rw', db.events, db.kv, async () => {
+    const stored = (await db.kv.get(DEMO_WEEK_KEY))?.value
+    const settingsRow = (await db.kv.get('settings'))?.value as { demoData?: boolean } | undefined
+    if (settingsRow && settingsRow.demoData === false) return
+    if (!force && stored === weekStart) return
+    await db.events.where('source').equals('local').filter((e) => !!e.demo).delete()
   const today = new Date()
   const at = (dayOffset: number, h: number, m: number) => set(addDays(today, dayOffset), { hours: h, minutes: m, seconds: 0, milliseconds: 0 })
   const ev = (dayOffset: number, h: number, m: number, mins: number, title: string, extra: Partial<CalEvent> = {}): CalEvent => {
@@ -433,12 +459,14 @@ export async function refreshDemoEvents(force = false): Promise<void> {
     ev(-1, 11, 0, 60, 'Northwind: pop-up venue walk-through', { projectId: 'p-northwind', color: '#f59e0b' }),
     ev(-2, 15, 0, 60, 'Quarterly planning', { color: '#8b6cff' }),
   ]
-  await db.events.bulkPut(events)
-  await kvSet(DEMO_WEEK_KEY, weekStart)
+    await db.events.bulkPut(events)
+    await db.kv.put({ key: DEMO_WEEK_KEY, value: weekStart })
+  })
 }
 
 export async function clearDemoData(): Promise<void> {
-  await db.transaction('rw', [db.projects, db.tasks, db.events, db.contacts, db.coverage, db.content, db.research, db.decks, db.sites, db.notes, db.kv], async () => {
+  await db.transaction('rw', [db.projects, db.tasks, db.events, db.contacts, db.coverage, db.content, db.research, db.decks, db.sites, db.notes, db.log, db.kv], async () => {
+    await db.log.filter((x) => !!x.demo).delete()
     await db.projects.filter((x) => !!x.demo).delete()
     await db.tasks.filter((x) => !!x.demo).delete()
     await db.events.filter((x) => !!x.demo).delete()
