@@ -106,9 +106,9 @@ export const SERVICES: ServiceInfo[] = [
     name: 'Pollinations',
     category: 'Creative',
     color: '#34d399',
-    description: 'Optional token for higher limits on free Pollinations image generation.',
-    helpUrl: 'https://auth.pollinations.ai',
-    fields: [{ key: 'apiKey', label: 'Token', secret: true }],
+    description: 'Optional key for faster pictures from the free Pollinations service.',
+    helpUrl: 'https://enter.pollinations.ai',
+    fields: [{ key: 'apiKey', label: 'Key', placeholder: 'sk_…', secret: true }],
   },
   {
     id: 'tavily',
