@@ -8,13 +8,13 @@ const DEMO_FOOTER = '\n\n_Demo answer: connect an AI provider in **Settings → 
 
 function topicOf(prompt: string): string {
   // Group and studio prompts carry scaffolding; the subject is on its own line.
-  const labelled = prompt.match(/(?:discussion topic|topic|subject|objective):\s*(.+)/i)?.[1]
+  const labelled = prompt.match(/^(?:discussion topic|topic|subject|objective):\s*(.+)$/im)?.[1]
   let cleaned = (labelled ?? prompt.split('\n').find((l) => l.trim()) ?? '')
     .replace(/\s+/g, ' ')
     .trim()
     .replace(/[?.!:]+$/, '')
   // "Find three angles for the autumn launch" -> "the autumn launch"
-  const tail = cleaned.match(/\b(?:for|about|on)\s+(.{8,})$/i)?.[1]
+  const tail = labelled ? undefined : cleaned.match(/\b(?:for|about|on)\s+(.{8,})$/i)?.[1]
   if (tail && tail.split(' ').length >= 2) cleaned = tail
   return cleaned.length > 80 ? cleaned.slice(0, 77) + '…' : cleaned || 'this'
 }

@@ -80,7 +80,7 @@ function NewHuddle({ onBack }: { onBack?: () => void }) {
   const ideas = useMemo(() => {
     const live = projects.filter((p) => p.status === 'active' || p.status === 'pitch').slice(0, 2)
     return [
-      ...live.map((p) => `What’s the boldest way to get ${p.client ?? p.name} national coverage this quarter?`),
+      ...live.map((p) => `What’s the boldest way to get ${p.client && !/internal/i.test(p.client) ? p.client : p.name} national coverage this quarter?`),
       'A negative review about a client is going viral. How do we respond in the next hour?',
       'Brainstorm three stunts that would get us talked about',
       'What should our own LinkedIn strategy be for the next six months?',

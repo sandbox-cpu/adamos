@@ -110,7 +110,8 @@ export async function runAgent(o: AgentRunOptions): Promise<AgentRunResult> {
   const messages: ChatTurn[] = [...(o.history ?? []), { role: 'user', content: `${contextHeader(o.context)}\n\n${o.prompt}` }]
 
   let demo = o.demo
-  if (!profile && !demo) demo = { text: await buildDemoReply(o.agent, role, o.prompt, settings) }
+  // A mastermind's objective lives in its briefing, so demo replies read that too.
+  if (!profile && !demo) demo = { text: await buildDemoReply(o.agent, role, mode === 'mastermind' && o.context ? `${o.context}\n\n${o.prompt}` : o.prompt, settings) }
 
   const webActivities = new Map<string, ActivityItem>()
   const result = await runLLM(profile, {

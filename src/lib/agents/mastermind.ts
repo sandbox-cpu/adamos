@@ -31,6 +31,17 @@ async function mutate(id: string, fn: (s: MastermindSession) => MastermindSessio
   return next
 }
 
+/** A short session title from the objective, cut at a word boundary. */
+function titleFrom(objective: string): string {
+  const first = objective
+    .trim()
+    .split(/[.?!\n]/)[0]
+    .trim()
+  if (first.length <= 90) return first
+  const cut = first.slice(0, 80)
+  return `${cut.slice(0, cut.lastIndexOf(' ') > 40 ? cut.lastIndexOf(' ') : 80)}…`
+}
+
 export async function createMastermind(input: {
   title?: string
   objective: string
@@ -44,7 +55,7 @@ export async function createMastermind(input: {
   const t = Date.now()
   const session: MastermindSession = {
     id: uid(),
-    title: input.title?.trim() || input.objective.split(/[.?!\n]/)[0].slice(0, 70),
+    title: input.title?.trim() || titleFrom(input.objective),
     objective: input.objective.trim(),
     context: input.context?.trim() || undefined,
     projectId: input.projectId,
@@ -386,6 +397,22 @@ export function stopMastermind(sessionId: string) {
   useLive.getState().stop(sessionId)
 }
 
+/** Clears a session's discussion and runs it again from the top. */
+export async function restartMastermind(sessionId: string): Promise<void> {
+  await mutate(sessionId, (s) => ({ ...s, contributions: [], synthesis: undefined, plan: undefined, phase: 'setup', error: undefined, createdAt: Date.now() }))
+  await runMastermind(sessionId)
+}
+
+export async function deleteMastermind(sessionId: string): Promise<void> {
+  stopMastermind(sessionId)
+  await db.masterminds.delete(sessionId)
+}
+
+/** The calendar date an action or milestone falls on, counted from when the plan was made. */
+export function planDate(session: MastermindSession, dueInDays: number): string {
+  return dateFromNow(dueInDays, new Date(session.createdAt))
+}
+
 /* ------------------------------------------------------------------ */
 /*  Using the plan                                                     */
 /* ------------------------------------------------------------------ */
@@ -405,7 +432,7 @@ export async function pushActionsToBoard(sessionId: string, projectId: string | 
       title: a.title,
       description: a.description || undefined,
       projectId,
-      dueDate: dateFromNow(a.dueInDays),
+      dueDate: dateFromNow(a.dueInDays, new Date(session.createdAt)),
       priority: a.priority,
       assigneeId: owner?.id ?? 'me',
       source: `Mastermind: ${session.title}`,
@@ -422,7 +449,7 @@ export async function milestonesToCalendar(sessionId: string): Promise<number> {
   const session = await db.masterminds.get(sessionId)
   if (!session?.plan) return 0
   for (const m of session.plan.milestones) {
-    const date = dateFromNow(m.dueInDays)
+    const date = dateFromNow(m.dueInDays, new Date(session.createdAt))
     await createEvent({
       title: `Milestone: ${m.title}`,
       start: new Date(`${date}T00:00:00`).toISOString(),
@@ -450,8 +477,8 @@ export async function planToMarkdown(session: MastermindSession): Promise<string
     `## Summary\n${plan.summary}`,
     `## Objectives\n${plan.objectives.map((o) => `- ${o}`).join('\n')}`,
     `## Workstreams\n${plan.workstreams.map((w) => `- **${w.name}** (${w.owner}): ${w.description}`).join('\n')}`,
-    `## Actions\n${plan.actions.map((a) => `- [ ] ${a.title} · ${a.owner} · due ${dateFromNow(a.dueInDays)} · ${a.priority}`).join('\n')}`,
-    `## Milestones\n${plan.milestones.map((m) => `- ${dateFromNow(m.dueInDays)}: ${m.title}`).join('\n')}`,
+    `## Actions\n${plan.actions.map((a) => `- [ ] ${a.title} · ${a.owner} · due ${dateFromNow(a.dueInDays, new Date(session.createdAt))} · ${a.priority}`).join('\n')}`,
+    `## Milestones\n${plan.milestones.map((m) => `- ${dateFromNow(m.dueInDays, new Date(session.createdAt))}: ${m.title}`).join('\n')}`,
     `## Risks\n${plan.risks.map((r) => `- **${r.risk}** (${r.impact}): ${r.mitigation}`).join('\n')}`,
     `## KPIs\n${plan.kpis.map((k) => `- ${k.metric}: ${k.target}`).join('\n')}`,
     `## Next 48 hours\n${plan.nextSteps.map((n) => `- ${n}`).join('\n')}`,
