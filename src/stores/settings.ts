@@ -56,6 +56,15 @@ function merge<T extends object>(base: T, patch: DeepPartial<T>): T {
   return out as T
 }
 
+export const ACCENTS: { id: AccentId; name: string; colors: [string, string] }[] = [
+  { id: 'aurora', name: 'Aurora', colors: ['#8b6cff', '#2dd4f0'] },
+  { id: 'ember', name: 'Ember', colors: ['#fb7185', '#fbbf24'] },
+  { id: 'emerald', name: 'Emerald', colors: ['#10b981', '#a3e635'] },
+  { id: 'ocean', name: 'Ocean', colors: ['#3b82f6', '#22d3ee'] },
+  { id: 'solar', name: 'Solar', colors: ['#f59e0b', '#fde047'] },
+  { id: 'mono', name: 'Mono', colors: ['#e4e7ef', '#9aa3b8'] },
+]
+
 export function applyAccent(accent: AccentId) {
   document.documentElement.dataset.accent = accent
 }

@@ -27,9 +27,9 @@ import { testProfile } from '../../lib/llm'
 import { exportEverything, importEverything } from '../../lib/backup'
 import { clearDemoData, resetEverything } from '../../lib/seed'
 import { IMAGE_PROVIDERS } from '../../lib/media/generate'
-import type { AccentId, AIProfile, Settings } from '../../lib/types'
+import type { AIProfile, Settings } from '../../lib/types'
 import { cn, downloadText, isoDate } from '../../lib/utils'
-import { osNameOf, useSettings } from '../../stores/settings'
+import { ACCENTS, osNameOf, useSettings } from '../../stores/settings'
 import { useUI } from '../../stores/ui'
 import { useAgents, useProfiles, useRoles, useSecrets } from '../../hooks/data'
 import { PageHeader, Panel, PanelHeader } from '../../components/ui/Panel'
@@ -43,15 +43,6 @@ import { ServiceMark } from '../../components/ui/ProviderMark'
 import { ConnectAIFlow } from './ConnectAI'
 
 type Tab = 'ai' | 'profile' | 'appearance' | 'integrations' | 'data' | 'about'
-
-const ACCENTS: { id: AccentId; name: string; colors: [string, string] }[] = [
-  { id: 'aurora', name: 'Aurora', colors: ['#8b6cff', '#2dd4f0'] },
-  { id: 'ember', name: 'Ember', colors: ['#fb7185', '#fbbf24'] },
-  { id: 'emerald', name: 'Emerald', colors: ['#10b981', '#a3e635'] },
-  { id: 'ocean', name: 'Ocean', colors: ['#3b82f6', '#22d3ee'] },
-  { id: 'solar', name: 'Solar', colors: ['#f59e0b', '#fde047'] },
-  { id: 'mono', name: 'Mono', colors: ['#e4e7ef', '#9aa3b8'] },
-]
 
 function ProfileCard({ profile, agentsUsing, onEdit }: { profile: AIProfile; agentsUsing: number; onEdit: () => void }) {
   const settings = useSettings((s) => s.settings)
