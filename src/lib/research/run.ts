@@ -2,7 +2,7 @@ import { db } from '../db'
 import { saveNewNote } from '../brain/vault-fs'
 import { getLeadAgent, logActivity } from '../ops'
 import type { Agent, Citation, ResearchReport } from '../types'
-import { isAbortError, uid } from '../utils'
+import { isAbortError, truncate, uid } from '../utils'
 import { trackJob } from '../../stores/jobs'
 import { createStreamWriter, useLive } from '../../stores/live'
 import { useSettings } from '../../stores/settings'
@@ -40,7 +40,7 @@ export async function startResearch(input: {
   const t = Date.now()
   const report: ResearchReport = {
     id: uid(),
-    title: `${template.name}: ${input.subject}`,
+    title: template.id === 'question' ? truncate(input.subject.trim(), 90) : `${template.name}: ${input.subject}`,
     templateId: template.id,
     subject: input.subject,
     context: input.context,
@@ -97,7 +97,7 @@ export async function runResearch(reportId: string, depth: 'quick' | 'balanced' 
           onNotice: (m) => useLive.getState().patch(key, { notices: [...(useLive.getState().messages[key]?.notices ?? []), m] }),
         },
         demo: {
-          text: `> Demo report. Connect Claude or Gemini in **Settings → AI** for live web research with sources.\n\n## Executive summary\nA first look at **${report.subject}** using the ${template.name.toLowerCase()} framework. With a live AI connected, this report is researched from current sources and every claim is cited.\n\n## What we’d look at\n- The latest data and reports on ${report.subject}\n- Recent news and announcements from the key players\n- What audiences are saying and sharing\n- What this means for your clients\n\n## Early recommendations\n1. Lead with one sharp, evidenced insight\n2. Move quickly on the most timely opportunity\n3. Track results against two or three clear measures`,
+          text: `> Demo report. Connect Claude or Gemini in **Settings → AI** for live web research with sources.\n\n## Executive summary\nA first look at **${report.subject}**${template.id === 'question' ? '' : ` using the ${template.name.toLowerCase()} framework`}. With a live AI connected, this report is researched from current sources and every claim is cited.\n\n## What we’d look at\n- The latest data and reports on ${report.subject}\n- Recent news and announcements from the key players\n- What audiences are saying and sharing\n- What this means for your clients\n\n## Early recommendations\n1. Lead with one sharp, evidenced insight\n2. Move quickly on the most timely opportunity\n3. Track results against two or three clear measures`,
         },
       })
       writer.flush()

@@ -40,8 +40,8 @@ export function LeadDock() {
   const navigate = useNavigate()
   const location = useLocation()
   const userName = useSettings((s) => s.settings.userName.split(' ')[0])
-  // Chat pages have their own message box where the floating button would sit.
-  const hideLauncher = /^\/(comms|huddle|live)(\/|$)/.test(location.pathname)
+  // Chat pages and full-screen editors have their own controls where the floating button would sit.
+  const hideLauncher = /^\/(comms|huddle|live|brain)(\/|$)/.test(location.pathname) || /^\/(decks|sites)\/[^/]+/.test(location.pathname)
 
   useEffect(() => {
     if (open && lead) void getLeadConversation().then(setConv)

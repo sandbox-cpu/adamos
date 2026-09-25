@@ -13,6 +13,18 @@ export interface ResearchTemplate {
 
 export const RESEARCH_TEMPLATES: ResearchTemplate[] = [
   {
+    id: 'question',
+    name: 'Ask anything',
+    description: 'Any question, researched from live sources with citations.',
+    icon: 'Microscope',
+    color: '#a78bfa',
+    roleId: 'research',
+    subjectLabel: 'Your question',
+    placeholder: 'e.g. What are UK consumers saying about sustainable coffee?',
+    minutes: 45,
+    instructions: `Answer the question properly: open with a direct answer in two or three sentences, then the evidence (each point with a source), what it means for us, and recommended next steps. Use headings and bullet points where they help.`,
+  },
+  {
     id: 'market',
     name: 'Market landscape',
     description: 'Size, trends, drivers and the main players in a market.',
