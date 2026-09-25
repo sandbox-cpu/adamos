@@ -60,7 +60,7 @@ export async function writeContent(id: string, instruction?: string, useWeb = fa
   const writer = createStreamWriter(key)
   await db.content.update(id, { status: 'generating' })
   const briefLines = tpl.fields
-    .map((f) => (piece.brief[f.key]?.trim() ? `${f.label}: ${piece.brief[f.key].trim()}` : ''))
+    .map((f) => (piece.brief[f.key]?.trim() ? `${f.label.replace(/\?$/, '')}: ${piece.brief[f.key].trim()}` : ''))
     .filter(Boolean)
     .join('\n')
   try {

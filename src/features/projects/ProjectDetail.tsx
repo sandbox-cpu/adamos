@@ -130,7 +130,7 @@ function Overview({ project }: { project: Project }) {
     ...(links?.sites ?? []).map((s) => ({ id: s.id, icon: <PanelsTopLeft />, label: s.name, kind: 'Landing page', to: `/sites/${s.id}` })),
     ...(links?.research ?? []).map((r) => ({ id: r.id, icon: <FlaskConical />, label: r.title, kind: 'Research', to: `/research/${r.id}` })),
     ...(links?.masterminds ?? []).map((m) => ({ id: m.id, icon: <BrainCircuit />, label: m.plan?.title ?? m.title, kind: 'Mastermind', to: `/mastermind/${m.id}` })),
-    ...(links?.content ?? []).map((c) => ({ id: c.id, icon: <FileText />, label: c.title, kind: 'Press office', to: `/press?item=${c.id}` })),
+    ...(links?.content ?? []).map((c) => ({ id: c.id, icon: <FileText />, label: c.title, kind: 'Press office', to: `/press?doc=${c.id}` })),
   ]
   const upcoming = (links?.events ?? []).filter((e) => e.end >= new Date().toISOString()).sort((a, b) => a.start.localeCompare(b.start))
 
