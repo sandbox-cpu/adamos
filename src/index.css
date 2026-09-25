@@ -502,3 +502,25 @@
     background: white;
   }
 }
+
+/* Labels floating over the 3D brain */
+.brain-label {
+  white-space: nowrap;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 500;
+  color: rgb(255 255 255 / 0.86);
+  background: rgb(8 9 14 / 0.62);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  backdrop-filter: blur(6px);
+  transform: translateY(-50%);
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.6);
+}
+.brain-label-strong {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #fff;
+  border-color: color-mix(in oklab, var(--accent) 60%, transparent);
+  box-shadow: 0 0 24px -4px var(--accent);
+}
