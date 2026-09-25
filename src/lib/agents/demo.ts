@@ -46,6 +46,26 @@ async function overdueSummary(): Promise<string> {
   return `**${tasks.length} things are overdue:**\n${tasks.map((t) => `- ${t.title} (${friendlyDate(t.dueDate)})`).join('\n')}\n\nWant me to reschedule them or hand some to the team?`
 }
 
+/** A short, spoken-style sample answer for voice calls (no lists or formatting). */
+export async function buildVoiceDemoReply(prompt: string, settings: Settings): Promise<string> {
+  const p = prompt.toLowerCase()
+  const name = settings.userName.split(' ')[0] || 'there'
+  const note = 'This is a sample answer; connect an AI in Settings and I can do much more.'
+  if (/\b(calendar|schedule|meetings?|diary|agenda|today|tomorrow|my day)\b/.test(p)) {
+    const tomorrow = /\btomorrow\b/.test(p)
+    const day = startOfDay(addDays(new Date(), tomorrow ? 1 : 0))
+    const events = await eventsBetween(day, addDays(day, 1))
+    const when = tomorrow ? 'Tomorrow' : 'Today'
+    if (!events.length) return `${when} looks clear, ${name}, a good chance for some deep work. ${note}`
+    const list = events
+      .slice(0, 4)
+      .map((e) => `${format(new Date(e.start), 'h:mm a')}, ${e.title}`)
+      .join('; ')
+    return `${when} you have ${events.length} thing${events.length === 1 ? '' : 's'} in the diary: ${list}. Want me to get you ready for any of them? ${note}`
+  }
+  return `Happy to help with ${topicOf(prompt)}, ${name}. I’m on sample answers right now, so connect an AI in Settings and I’ll talk it through properly, with your screen, your projects and your brain.`
+}
+
 export async function buildDemoReply(agent: Agent, role: Role, prompt: string, settings: Settings): Promise<string> {
   const p = prompt.toLowerCase()
   if (agent.isLead) {

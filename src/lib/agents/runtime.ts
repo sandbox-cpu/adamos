@@ -6,7 +6,7 @@ import { getAllRoles, roleFor } from '../ops'
 import type { ActivityItem, Agent, Citation, Depth } from '../types'
 import { truncate } from '../utils'
 import { useSettings } from '../../stores/settings'
-import { buildDemoReply } from './demo'
+import { buildDemoReply, buildVoiceDemoReply } from './demo'
 import { buildSystemPrompt, contextHeader, type AgentMode } from './prompts'
 import { buildToolkit, type ToolContext } from './tools'
 
@@ -111,7 +111,13 @@ export async function runAgent(o: AgentRunOptions): Promise<AgentRunResult> {
 
   let demo = o.demo
   // A mastermind's objective lives in its briefing, so demo replies read that too.
-  if (!profile && !demo) demo = { text: await buildDemoReply(o.agent, role, mode === 'mastermind' && o.context ? `${o.context}\n\n${o.prompt}` : o.prompt, settings) }
+  if (!profile && !demo)
+    demo = {
+      text:
+        mode === 'voice'
+          ? await buildVoiceDemoReply(o.prompt, settings)
+          : await buildDemoReply(o.agent, role, mode === 'mastermind' && o.context ? `${o.context}\n\n${o.prompt}` : o.prompt, settings),
+    }
 
   const webActivities = new Map<string, ActivityItem>()
   const result = await runLLM(profile, {

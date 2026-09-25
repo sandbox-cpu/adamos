@@ -32,6 +32,15 @@ export const DEFAULT_SETTINGS: Settings = {
     geminiModel: 'gemini-2.5-flash-image',
     openaiModel: 'gpt-image-1',
   },
+  live: {
+    engine: 'auto',
+    geminiVoice: 'Kore',
+    geminiModel: '',
+    openaiVoice: 'marin',
+    openaiModel: 'gpt-realtime',
+    browserVoice: '',
+    agentId: '',
+  },
 }
 
 type DeepPartial<T> = { [K in keyof T]?: T[K] extends object ? DeepPartial<T[K]> : T[K] }

@@ -635,5 +635,18 @@ export interface Settings {
     geminiModel: string
     openaiModel: string
   }
+  live: {
+    /** Which service runs live calls; 'auto' picks the best one available. */
+    engine: 'auto' | 'gemini' | 'openai' | 'browser'
+    geminiVoice: string
+    /** Blank finds a live model automatically. */
+    geminiModel: string
+    openaiVoice: string
+    openaiModel: string
+    /** A voice built into the browser, used by browser voice calls. Blank uses the default. */
+    browserVoice: string
+    /** Who picks up by default; blank means the lead agent. */
+    agentId: string
+  }
   brief?: { date: string; content: string }
 }
